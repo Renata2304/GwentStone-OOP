@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import checker.CheckerConstants;
+//import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.ActionsInput;
 import fileio.CardInput;
 import fileio.GameInput;
 import fileio.Input;
+import other.OutPrint;
 
 import java.util.ArrayList;
 
@@ -103,68 +105,40 @@ public final class Main {
             Collections.shuffle(deck1, new Random(shuff));
             Collections.shuffle(deck2, new Random(shuff));
 
+            CardInput hero1 = game.getStartGame().getPlayerOneHero();
+            CardInput hero2 = game.getStartGame().getPlayerTwoHero();
+            final int nr = 30;
+            hero1.setHealth(nr);
+            hero2.setHealth(nr);
+
             for (ActionsInput action : game.getActions()) {
-                switch (inputData.getGames().get(0).getActions().get(0).getCommand()) {
+                switch (action.getCommand()) {
                     case "getPlayerDeck" -> {
                         //tsk1
-                        switch (action.getPlayerIdx()) {
-                            case 2 -> {
-                                // output player two
-                                ObjectNode jsonNodes = output.addObject();
-                                jsonNodes.put("command", action.getCommand());
-                                jsonNodes.put("playerIdx", action.getPlayerIdx());
-                                ArrayNode arrayNode = jsonNodes.putArray("output");
-                                for (int i = 1; i < inputData.getPlayerTwoDecks().getNrCardsInDeck(); i++) {
-                                    CardInput card = deck2.get(i);
-                                    ObjectNode arrayNode2 = objectMapper.createObjectNode();
-                                    arrayNode2.put("mana", card.getMana());
-                                    if (card.getHealth() != 0) {
-                                        arrayNode2.put("attackDamage", card.getAttackDamage());
-                                        arrayNode2.put("health", card.getHealth());
-                                    }
-                                    arrayNode2.put("description", card.getDescription());
-
-                                    ArrayNode colors = arrayNode2.putArray("colors");
-                                    for (String color : card.getColors()) {
-                                        colors.add(color);
-                                    }
-                                    arrayNode2.put("name", card.getName());
-                                    arrayNode.add(arrayNode2);
-                                }
-                            }
-                            case 1 -> { // output player one
-                                ObjectNode jsonNodes = output.addObject();
-                                jsonNodes.put("command", action.getCommand());
-                                jsonNodes.put("playerIdx", action.getPlayerIdx());
-                                ArrayNode arrayNode = jsonNodes.putArray("output");
-                                for (int i = 1; i < inputData.getPlayerOneDecks().getNrCardsInDeck(); i++) {
-                                    CardInput card = deck1.get(i);
-                                    ObjectNode arrayNode2 = objectMapper.createObjectNode();
-                                    arrayNode2.put("mana", card.getMana());
-                                    if (card.getHealth() != 0) {
-                                        arrayNode2.put("attackDamage", card.getAttackDamage());
-                                        arrayNode2.put("health", card.getHealth());
-                                    }
-                                    arrayNode2.put("description", card.getDescription());
-
-                                    ArrayNode colors = arrayNode2.putArray("colors");
-                                    for (String color : card.getColors()) {
-                                        colors.add(color);
-                                    }
-                                    arrayNode2.put("name", card.getName());
-                                    arrayNode.add(arrayNode2);
-                                }
-                            }
-                        }
+                        OutPrint.printPlayerDeck(output, objectMapper, inputData.
+                                getPlayerTwoDecks().getNrCardsInDeck(), deck1, deck2, action);
                     }
                     case "endPlayerTurn" -> {
                         //idk
+                        if (playerTurn == 1) {
+                            playerTurn = 2;
+                        } else {
+                            playerTurn = 1;
+                        }
                     }
                     case "getPlayerHero" -> {
+                        if (action.getPlayerIdx() == 1) {
+                            OutPrint.printPlayerHero(output, action, objectMapper, hero1);
+                        } else {
+                            OutPrint.printPlayerHero(output, action, objectMapper, hero2);
+                        }
+                    }
+                    case "getPlayerTurn" -> {
                         ObjectNode jsonNodes = output.addObject();
                         jsonNodes.put("command", action.getCommand());
-                        jsonNodes.put("playerIdx", action.getPlayerIdx());
-                        ArrayNode arrayNode = jsonNodes.putArray("output");
+                        jsonNodes.put("output", playerTurn);
+                    }
+                    default -> {
                     }
                 }
                 //System.out.printf(filePath2, deck1);

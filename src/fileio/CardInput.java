@@ -61,6 +61,13 @@ public final class CardInput {
         this.name = name;
     }
 
+    /**
+     * i dunno 0
+     * @param deck
+     * @param idx
+     * @param i
+     * @return
+     */
     public CardInput copyPlayer(final DecksInput deck, final int idx, final int i) {
         CardInput card = new CardInput();
         card.setMana(deck.getDecks().get(idx).get(i).getMana());

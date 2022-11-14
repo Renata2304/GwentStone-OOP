@@ -1,8 +1,2 @@
 Starting audit...
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:64:5: Missing a Javadoc comment. [MissingJavadocMethod]
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\main\Main.java:107:17: switch without "default" clause. [MissingSwitchDefault]
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\main\Main.java:110:25: switch without "default" clause. [MissingSwitchDefault]
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\main\Main.java:117: Line is longer than 100 characters (found 108). [LineLength]
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\main\Main.java:140: Line is longer than 100 characters (found 108). [LineLength]
 Audit done.
-Checkstyle ends with 5 errors.
