@@ -61,6 +61,20 @@ public final class CardInput {
         this.name = name;
     }
 
+    public CardInput copyPlayer(final DecksInput deck, final int idx, final int i) {
+        CardInput card = new CardInput();
+        card.setMana(deck.getDecks().get(idx).get(i).getMana());
+        card.setAttackDamage(deck.getDecks().get(idx).get(i).getAttackDamage());
+        card.setHealth(deck.getDecks().get(idx).get(i).getHealth());
+        card.setDescription(deck.getDecks().get(idx).get(i).getDescription());
+        card.setColors(deck.getDecks().get(idx).get(i).getColors());
+        card.setName(deck.getDecks().get(idx).get(i).getName());
+
+        return card;
+    }
+
+
+
     @Override
     public String toString() {
         return "CardInput{"
