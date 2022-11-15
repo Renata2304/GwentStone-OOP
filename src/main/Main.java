@@ -8,11 +8,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import checker.CheckerConstants;
 //import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fileio.ActionsInput;
-import fileio.CardInput;
-import fileio.GameInput;
-import fileio.Input;
-import other.OutPrint;
+import fileio.*;
+import functions.OutPrint;
 
 import java.util.ArrayList;
 
@@ -76,83 +73,50 @@ public final class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         Input inputData = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH + filePath1),
                 Input.class);
-
         ArrayNode output = objectMapper.createArrayNode();
         //TODO add here the entry point to your implementation
         //GameInput game = inputData.getGames().get(0);
-
         for (GameInput game : inputData.getGames()) {
             int playerTurn = game.getStartGame().getStartingPlayer();
             int startPlayer = playerTurn;
             int shuff = game.getStartGame().getShuffleSeed();
-
             int idx1 = game.getStartGame().getPlayerOneDeckIdx();
             int idx2 = game.getStartGame().getPlayerTwoDeckIdx();
-
-            int mana1 = 1, mana2 = 1;
-
-            int endCont = 0;
-
+            int mana1 = 1, mana2 = 1, endCont = 0;
             int nrCards1 = inputData.getPlayerOneDecks().getNrCardsInDeck();
             int nrCards2 = inputData.getPlayerTwoDecks().getNrCardsInDeck();
-
             int nrCardsHand1 = 0; int nrCardsHand2 = 0;
             final int rowsmax = 4, manaMax = 10;
-
             ArrayList<ArrayList<CardInput>> table = new ArrayList<>();
             table.add(new ArrayList<>()); table.add(new ArrayList<>());
             table.add(new ArrayList<>()); table.add(new ArrayList<>());
-
-            ArrayList<CardInput> deck1 = new ArrayList<>();
-            ArrayList<CardInput> deck2 = new ArrayList<>();
-
             // generating player1's deck
-            for (int i = 0; i < nrCards1; i++) {
-                CardInput copy = new CardInput();
-                copy = copy.copyOneCard(inputData.getPlayerOneDecks().getDecks().get(idx1), i);
-                deck1.add(copy);
-            }
-
+            ArrayList<CardInput> deck1 =  DecksInput.getNewDeck(inputData.getPlayerOneDecks().
+                    getDecks().get(idx1), nrCards1);
             // generation player2's deck
-            for (int i = 0; i < nrCards2; i++) {
-                CardInput copy = new CardInput();
-                copy = copy.copyOneCard(inputData.getPlayerTwoDecks().getDecks().get(idx2), i);
-                deck2.add(copy);
-            }
-
+            ArrayList<CardInput> deck2 = DecksInput.getNewDeck(inputData.getPlayerTwoDecks().
+                    getDecks().get(idx2), nrCards2);
             // shuffle the two decks
             Collections.shuffle(deck1, new Random(shuff));
             Collections.shuffle(deck2, new Random(shuff));
-
             // getting the hero for each player
             CardInput hero1 = game.getStartGame().getPlayerOneHero();
             CardInput hero2 = game.getStartGame().getPlayerTwoHero();
-
             // setting health for each player's hero
-            final int nr = 30;
-            hero1.setHealth(nr);
-            hero2.setHealth(nr);
-
+            final int nr = 30; hero1.setHealth(nr); hero2.setHealth(nr);
             // creating each player's hands
             ArrayList<CardInput> cardsHand1 = new ArrayList<>();
             ArrayList<CardInput> cardsHand2 = new ArrayList<>();
-
-            CardInput copy1 = new CardInput();
-            copy1 = copy1.copyOneCard(deck1, 0);
+            // taking the first card
+            CardInput copy1 = new CardInput(); copy1 = copy1.copyOneCard(deck1, 0);
             cardsHand1.add(copy1);
             // removing the card taken from the deck
-            deck1.remove(0);
-            nrCards1--;
-            nrCardsHand1++;
-
-            CardInput copy2 = new CardInput();
-            copy2 = copy2.copyOneCard(deck2, 0);
+            deck1.remove(0); nrCards1--; nrCardsHand1++;
+            // taking the first card
+            CardInput copy2 = new CardInput(); copy2 = copy2.copyOneCard(deck2, 0);
             cardsHand2.add(copy2);
             // removing the card taken from the deck
-            deck2.remove(0);
-            nrCards2--;
-            nrCardsHand2++;
-
+            deck2.remove(0); nrCards2--; nrCardsHand2++;
             // going through actions
             for (ActionsInput action : game.getActions()) {
                 switch (action.getCommand()) {
@@ -174,27 +138,15 @@ public final class Main {
                             // copy the first card from deck1 to player1's hand
                             // removing the card taken from the deck
                             if (!deck1.isEmpty()) {
-                                copy1 = new CardInput();
-                                copy1 = copy1.copyOneCard(deck1, 0);
-                                cardsHand1.add(copy1);
-                                deck1.remove(0);
-                                nrCards1--;
-                                nrCardsHand1++;
+                                copy1 = new CardInput(); copy1 = copy1.copyOneCard(deck1, 0);
+                                cardsHand1.add(copy1); deck1.remove(0); nrCards1--; nrCardsHand1++;
                             }
-
-
                             // removing the card taken from the deck
                             if (!deck2.isEmpty()) {
-                                copy2 = new CardInput();
-                                copy2 = copy2.copyOneCard(deck2, 0);
-                                cardsHand2.add(copy2);
-                                deck2.remove(0);
-                                nrCards2--;
-                                nrCardsHand2++;
+                                copy2 = new CardInput(); copy2 = copy2.copyOneCard(deck2, 0);
+                                cardsHand2.add(copy2); deck2.remove(0); nrCards2--; nrCardsHand2++;
                             }
-
                             playerTurn = startPlayer;
-
                             mana1 += OutPrint.incMana(mana1, endCont, manaMax);
                             mana2 += OutPrint.incMana(mana2, endCont, manaMax);
                         } else {
@@ -227,14 +179,12 @@ public final class Main {
                                     action, nrCardsHand1, nrCardsHand2);
                     }
                     case "placeCard" -> {
-                        int mana = OutPrint.addRow(cardsHand1, cardsHand2, table, playerTurn,
-                                action.getHandIdx());
+                        int mana = OutPrint.addRow(output, action, cardsHand1, cardsHand2, table,
+                                playerTurn, action.getHandIdx(), mana1, mana2);
                         if (mana != 0 && playerTurn == 1) {
-                            nrCardsHand1--;
-                            mana1 -= mana;
+                            nrCardsHand1--; mana1 -= mana;
                         } else if (mana != 0 && playerTurn == 2) {
-                            nrCardsHand2--;
-                            mana2 -= mana;
+                            nrCardsHand2--; mana2 -= mana;
                         }
                     }
                     case "getCardsOnTable" -> {
@@ -242,13 +192,49 @@ public final class Main {
                         jsonNodes.put("command", action.getCommand());
                         ArrayNode arrayNode1 = jsonNodes.putArray("output");
                         for (int i = 0; i < rowsmax; i++) {
-                            if (!table.get(i).isEmpty()) {
-                                ArrayNode arrayNode2 = arrayNode1.addArray();
-                                for (int cardId = 0; cardId < table.get(i).size(); cardId++) {
-                                    OutPrint.printCard(objectMapper, arrayNode2, table.get(i),
-                                            cardId);
-                                }
+                            ArrayNode arrayNode2 = arrayNode1.addArray();
+                            for (int cardId = 0; cardId < table.get(i).size(); cardId++) {
+                                OutPrint.printCard(objectMapper, arrayNode2, table.get(i),
+                                        cardId);
                             }
+                        }
+                    }
+                    case "getEnvironmentCardsInHand" -> {
+                        OutPrint.printEnvironmentCard(output, objectMapper, cardsHand1, cardsHand2,
+                                action, nrCardsHand1, nrCardsHand2);
+                    }
+                    case "useEnvironmentCard" -> {
+                        int mana = CardInput.testCardEnvironment(output, action, playerTurn, table,
+                                cardsHand1, cardsHand2, mana1, mana2);
+                        if (mana != 0) {
+                            if (playerTurn == 1) {
+                                nrCardsHand1--;
+                                mana1 -= mana;
+                            } else {
+                                nrCardsHand2--;
+                                mana2 -= mana;
+                            }
+                        }
+                    }
+                    case "getCardAtPosition" -> {
+                        ObjectNode jsonNodes = output.addObject();
+                        jsonNodes.put("command", action.getCommand());
+                        if (action.getY() < table.get(action.getX()).size()) {
+                            ObjectNode jsonNodes2 = objectMapper.createObjectNode();
+                            jsonNodes.set("output", jsonNodes2);
+                            CardInput card = table.get(action.getX()).get(action.getY());
+                            jsonNodes2.put("mana", card.getMana());
+                            jsonNodes2.put("attackDamage", card.getAttackDamage());
+                            jsonNodes2.put("health", card.getHealth());
+                            jsonNodes2.put("description", card.getDescription());
+
+                            ArrayNode colors = jsonNodes2.putArray("colors");
+                            for (String color : card.getColors()) {
+                                colors.add(color);
+                            }
+                            jsonNodes2.put("name", card.getName());
+                        } else {
+                            jsonNodes.put("output", "No card at that position.");
                         }
                     }
                     default -> {

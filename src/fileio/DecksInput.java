@@ -34,6 +34,23 @@ public final class DecksInput {
         this.decks = decks;
     }
 
+    /**
+     *
+     * @param oldDeck
+     * @param nrCards
+     * @return
+     */
+    public static ArrayList<CardInput> getNewDeck(final ArrayList<CardInput> oldDeck,
+                                                  final int nrCards) {
+        ArrayList<CardInput> newDeck = new ArrayList<>();
+        for (int i = 0; i < nrCards; i++) {
+            CardInput copy = new CardInput();
+            copy = copy.copyOneCard(oldDeck, i);
+            newDeck.add(copy);
+        }
+        return newDeck;
+    }
+
     @Override
     public String toString() {
         return "InfoInput{"

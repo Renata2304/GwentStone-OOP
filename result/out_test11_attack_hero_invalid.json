@@ -1,4 +1,14 @@
 [ {
+  "command" : "getCardAtPosition",
+  "output" : {
+    "mana" : 1,
+    "attackDamage" : 5,
+    "health" : 8,
+    "description" : "Premium card: No matter how many, his body will fight. Save your breath for the Mountain is strong.",
+    "colors" : [ "Red", "Purple" ],
+    "name" : "Goliath"
+  }
+}, {
   "command" : "getPlayerHero",
   "playerIdx" : 1,
   "output" : {
@@ -22,11 +32,6 @@
   "command" : "getCardsInHand",
   "playerIdx" : 2,
   "output" : [ {
-    "mana" : 2,
-    "description" : "Premium card: All is white. My mouth is frozen and I must scream.",
-    "colors" : [ "White", "Grey", "Black" ],
-    "name" : "Winterfell"
-  }, {
     "mana" : 1,
     "attackDamage" : 6,
     "health" : 3,
@@ -37,10 +42,20 @@
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 2,
-  "output" : 7
+  "output" : 5
 }, {
   "command" : "getPlayerTurn",
   "output" : 2
+}, {
+  "command" : "getCardAtPosition",
+  "output" : {
+    "mana" : 1,
+    "attackDamage" : 6,
+    "health" : 3,
+    "description" : "Standard card: Trained by the best, nothing will catch him off-guard.",
+    "colors" : [ "Black", "White" ],
+    "name" : "Sentinel"
+  }
 }, {
   "command" : "getPlayerHero",
   "playerIdx" : 1,
@@ -64,7 +79,7 @@
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 2,
-  "output" : 15
+  "output" : 14
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,
@@ -79,10 +94,12 @@
     "colors" : [ "Black", "White" ],
     "name" : "Sentinel"
   }, {
-    "mana" : 2,
-    "description" : "Premium card: All is white. My mouth is frozen and I must scream.",
-    "colors" : [ "White", "Grey", "Black" ],
-    "name" : "Winterfell"
+    "mana" : 1,
+    "attackDamage" : 5,
+    "health" : 1,
+    "description" : "Standard card: A drink can always be served, with the blood of his enemies.",
+    "colors" : [ "Purple", "Yellow" ],
+    "name" : "Berserker"
   } ], [ {
     "mana" : 2,
     "attackDamage" : 5,
@@ -130,13 +147,6 @@
   "command" : "getCardsInHand",
   "playerIdx" : 2,
   "output" : [ {
-    "mana" : 1,
-    "attackDamage" : 5,
-    "health" : 1,
-    "description" : "Standard card: A drink can always be served, with the blood of his enemies.",
-    "colors" : [ "Purple", "Yellow" ],
-    "name" : "Berserker"
-  }, {
     "mana" : 1,
     "attackDamage" : 4,
     "health" : 8,

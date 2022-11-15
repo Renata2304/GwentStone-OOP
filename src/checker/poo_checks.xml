@@ -65,7 +65,7 @@
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
     <module name="FileTabCharacter"/>
 
-    <!-- Miscellaneous other checks.                   -->
+    <!-- Miscellaneous functions checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
     <module name="RegexpSingleline">
         <property name="format" value="\s+$"/>
@@ -184,7 +184,7 @@
             <property name="protectedAllowed" value="true"/>
         </module>
 
-        <!-- Miscellaneous other checks.                   -->
+        <!-- Miscellaneous functions checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle"/>
         <module name="FinalParameters"/>

@@ -36,7 +36,7 @@
   "output" : 2
 }, {
   "command" : "getCardsOnTable",
-  "output" : [ [ {
+  "output" : [ [ ], [ {
     "mana" : 2,
     "attackDamage" : 2,
     "health" : 6,
