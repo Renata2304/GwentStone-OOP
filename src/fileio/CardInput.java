@@ -1,6 +1,7 @@
 package fileio;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public final class CardInput {
     private int mana;
@@ -62,25 +63,58 @@ public final class CardInput {
     }
 
     /**
-     * i dunno 0
+     * Function that gets the type of certain card
+     * @param card
+     * @return
+     */
+    public String getType(final CardInput card) {
+        if (Objects.equals(card.name, "Sentinel") || Objects.equals(card.name, "Berserker")
+                || Objects.equals(card.name, "Goliath") || Objects.equals(card.name, "Warden")) {
+            return "Minion";
+        } else if (Objects.equals(card.name, "Miraj") || Objects.equals(card.name, "Disciple")
+                || Objects.equals(card.name, "The Cursed One") || Objects.equals(card.name,
+                "The Ripper")) {
+            return "Special";
+        } else if (Objects.equals(card.name, "Firestorm") || Objects.equals(card.name,
+                "Winterfell") || Objects.equals(card.name, "Heart Hound")) {
+            return "Environment";
+        }
+        return "No type";
+    }
+
+    /**
+     *
+     * @param card
+     * @return
+     */
+    public int getPosition(final CardInput card) {
+        if (Objects.equals(card.name, "The Ripper") || Objects.equals(card.name, "Miraj")
+                || Objects.equals(card.name, "Goliath") || Objects.equals(card.name, "Warden")) {
+            return 1; // front
+        } else if (Objects.equals(card.name, "Sentinel") || Objects.equals(card.name, "Disciple")
+                || Objects.equals(card.name, "The Cursed One") || Objects.equals(card.name,
+                "Berserker")) {
+            return 2; // back
+        }
+        return 0;
+    }
+    /**
+     * Function that deep copies every field of a card from a deck into a new card
      * @param deck
-     * @param idx
      * @param i
      * @return
      */
-    public CardInput copyPlayer(final DecksInput deck, final int idx, final int i) {
+    public CardInput copyOneCard(final ArrayList<CardInput> deck, final int i) {
         CardInput card = new CardInput();
-        card.setMana(deck.getDecks().get(idx).get(i).getMana());
-        card.setAttackDamage(deck.getDecks().get(idx).get(i).getAttackDamage());
-        card.setHealth(deck.getDecks().get(idx).get(i).getHealth());
-        card.setDescription(deck.getDecks().get(idx).get(i).getDescription());
-        card.setColors(deck.getDecks().get(idx).get(i).getColors());
-        card.setName(deck.getDecks().get(idx).get(i).getName());
+        card.setMana(deck.get(i).getMana());
+        card.setAttackDamage(deck.get(i).getAttackDamage());
+        card.setHealth(deck.get(i).getHealth());
+        card.setDescription(deck.get(i).getDescription());
+        card.setColors(deck.get(i).getColors());
+        card.setName(deck.get(i).getName());
 
         return card;
     }
-
-
 
     @Override
     public String toString() {
