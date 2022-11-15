@@ -65,6 +65,4 @@ public final class SmallFunctions {
         jsonNodes.put("error", "Cannot place card on table since row is full.");
     }
 
-
-
 }

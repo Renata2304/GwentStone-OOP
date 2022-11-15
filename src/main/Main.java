@@ -12,6 +12,7 @@ import fileio.ActionsInput;
 import fileio.Input;
 import fileio.GameInput;
 import fileio.DecksInput;
+//import functions.ForActions;
 import functions.OutPrint;
 
 import java.util.ArrayList;
@@ -88,13 +89,12 @@ public final class Main {
             int mana1 = 1, mana2 = 1, endCont = 0;
             int nrCards1 = inputData.getPlayerOneDecks().getNrCardsInDeck();
             int nrCards2 = inputData.getPlayerTwoDecks().getNrCardsInDeck();
-            int nrCardsHand1 = 0; int nrCardsHand2 = 0;
             final int rowsmax = 4, manaMax = 10;
             ArrayList<ArrayList<CardInput>> table = new ArrayList<>();
             table.add(new ArrayList<>()); table.add(new ArrayList<>());
             table.add(new ArrayList<>()); table.add(new ArrayList<>());
             // generating player1's deck
-            ArrayList<CardInput> deck1 =  DecksInput.getNewDeck(inputData.getPlayerOneDecks().
+            ArrayList<CardInput> deck1 = DecksInput.getNewDeck(inputData.getPlayerOneDecks().
                     getDecks().get(idx1), nrCards1);
             // generation player2's deck
             ArrayList<CardInput> deck2 = DecksInput.getNewDeck(inputData.getPlayerTwoDecks().
@@ -114,14 +114,18 @@ public final class Main {
             CardInput copy1 = new CardInput(); copy1 = copy1.copyOneCard(deck1, 0);
             cardsHand1.add(copy1);
             // removing the card taken from the deck
-            deck1.remove(0); nrCards1--; nrCardsHand1++;
+            deck1.remove(0); nrCards1--;
             // taking the first card
             CardInput copy2 = new CardInput(); copy2 = copy2.copyOneCard(deck2, 0);
             cardsHand2.add(copy2);
             // removing the card taken from the deck
-            deck2.remove(0); nrCards2--; nrCardsHand2++;
+            deck2.remove(0); nrCards2--;
             // going through actions
             for (ActionsInput action : game.getActions()) {
+                /*ForActions.forAc(output, action, objectMapper, deck1, deck2, cardsHand1,
+                        cardsHand2, hero1, hero2,
+                        endCont, startPlayer, playerTurn, table);
+                */
                 switch (action.getCommand()) {
                     case "getPlayerDeck" -> {
                         OutPrint.printPlayerDeck(output, objectMapper, deck1, deck2, action,
@@ -142,12 +146,12 @@ public final class Main {
                             // removing the card taken from the deck
                             if (!deck1.isEmpty()) {
                                 copy1 = new CardInput(); copy1 = copy1.copyOneCard(deck1, 0);
-                                cardsHand1.add(copy1); deck1.remove(0); nrCards1--; nrCardsHand1++;
+                                cardsHand1.add(copy1); deck1.remove(0); nrCards1--;
                             }
                             // removing the card taken from the deck
                             if (!deck2.isEmpty()) {
                                 copy2 = new CardInput(); copy2 = copy2.copyOneCard(deck2, 0);
-                                cardsHand2.add(copy2); deck2.remove(0); nrCards2--; nrCardsHand2++;
+                                cardsHand2.add(copy2); deck2.remove(0); nrCards2--;
                             }
                             playerTurn = startPlayer;
                             mana1 += OutPrint.incMana(mana1, endCont, manaMax);
@@ -179,15 +183,17 @@ public final class Main {
                     }
                     case "getCardsInHand" -> {
                         OutPrint.printPlayerDeck(output, objectMapper, cardsHand1, cardsHand2,
-                                    action, nrCardsHand1, nrCardsHand2);
+                                    action, cardsHand1.size(), cardsHand2.size());
                     }
                     case "placeCard" -> {
                         int mana = OutPrint.addRow(output, action, cardsHand1, cardsHand2, table,
                                 playerTurn, action.getHandIdx(), mana1, mana2);
                         if (mana != 0 && playerTurn == 1) {
-                            nrCardsHand1--; mana1 -= mana;
+                            //nrCardsHand1--;
+                            mana1 -= mana;
                         } else if (mana != 0 && playerTurn == 2) {
-                            nrCardsHand2--; mana2 -= mana;
+                            //nrCardsHand2--;
+                            mana2 -= mana;
                         }
                     }
                     case "getCardsOnTable" -> {
@@ -204,17 +210,15 @@ public final class Main {
                     }
                     case "getEnvironmentCardsInHand" -> {
                         OutPrint.printEnvironmentCard(output, objectMapper, cardsHand1, cardsHand2,
-                                action, nrCardsHand1, nrCardsHand2);
+                                action, cardsHand1.size(), cardsHand2.size());
                     }
                     case "useEnvironmentCard" -> {
                         int mana = CardInput.testCardEnvironment(output, action, playerTurn, table,
                                 cardsHand1, cardsHand2, mana1, mana2);
                         if (mana != 0) {
                             if (playerTurn == 1) {
-                                nrCardsHand1--;
                                 mana1 -= mana;
                             } else {
-                                nrCardsHand2--;
                                 mana2 -= mana;
                             }
                         }

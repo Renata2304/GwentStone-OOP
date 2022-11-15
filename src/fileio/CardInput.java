@@ -109,7 +109,8 @@ public final class CardInput {
             jsonNodes.put("error",
                     "Cannot place environment card on table.");
             return false;
-        } else if (card.getMana() > manaHand) {
+        }
+        if (card.getMana() > manaHand) {
             ObjectNode jsonNodes = output.addObject();
             jsonNodes.put("command", action.getCommand());
             jsonNodes.put("handIdx", action.getHandIdx());
