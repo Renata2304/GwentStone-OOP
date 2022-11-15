@@ -22,22 +22,22 @@ public final class OutPrint {
         jsonNodes.put("playerIdx", action.getPlayerIdx());
         ArrayNode arrayNode = jsonNodes.putArray("output");
         switch (action.getPlayerIdx()) {
-            case 1 :
+            case 1 -> {
                 if (nrCards1 != 0) {
                     for (int i = 0; i < nrCards1; i++) {
                         printCard(objectMapper, arrayNode, deck1, i);
                     }
                 }
-                break;
-            case 2 :
+            }
+            case 2 -> {
                 if (nrCards2 != 0) {
                     for (int i = 0; i < nrCards2; i++) {
                         printCard(objectMapper, arrayNode, deck2, i);
                     }
                 }
-                break;
-            default :
-                break;
+            }
+            default -> {
+            }
         }
     }
 
@@ -93,69 +93,15 @@ public final class OutPrint {
             final ArrayList<CardInput> cardsHand1, final ArrayList<CardInput> cardsHand2,
             final ArrayList<ArrayList<CardInput>> table, final int playerTurn, final int index,
             final int manamax1, final int manamax2) {
+        final int maxCol = 5, row0 = 0, row1 = 1, row2 = 2, row3 = 3;
         switch (playerTurn) {
             case 1 -> {
-                if (index >= cardsHand1.size()) {
-                    return 0;
-                }
-                CardInput card = new CardInput();
-                card = card.copyOneCard(cardsHand1, index);
-                if (!CardInput.testCardPlaceCard(output, action, card, manamax1)) {
-                    return 0;
-                }
-                if (card.getPosition(card) == 1) {
-                    if (table.get(2).size() == 5) {
-                        ObjectNode jsonNodes = output.addObject();
-                        jsonNodes.put("command", action.getCommand());
-                        jsonNodes.put("handIdx", action.getHandIdx());
-                        jsonNodes.put("error", "Cannot place card on table since row is full.");
-                        return 0;
-                    }
-                    table.get(2).add(card);
-                } else {
-                    if (table.get(3).size() == 5) {
-                        ObjectNode jsonNodes = output.addObject();
-                        jsonNodes.put("command", action.getCommand());
-                        jsonNodes.put("handIdx", action.getHandIdx());
-                        jsonNodes.put("error", "Cannot place card on table since row is full.");
-                        return 0;
-                    }
-                    table.get(3).add(card);
-                }
-
-                cardsHand1.remove(index);
-                return card.getMana();
+                return SmallFunctions.idk(output, action, cardsHand1, table, index, manamax1,
+                                          maxCol, row3, row2);
             }
             case 2 -> {
-                if (index >= cardsHand2.size()) {
-                    return 0;
-                }
-                CardInput card = new CardInput();
-                card = card.copyOneCard(cardsHand2, index);
-                if (!CardInput.testCardPlaceCard(output, action, card, manamax2)) {
-                    return 0;
-                }
-                if (card.getPosition(card) == 1) {
-                    if (table.get(1).size() == 5) {
-                        ObjectNode jsonNodes = output.addObject();
-                        jsonNodes.put("command", action.getCommand());
-                        jsonNodes.put("handIdx", action.getHandIdx());
-                        jsonNodes.put("error", "Cannot place card on table since row is full.");
-                        return 0;
-                    }
-                    table.get(1).add(card);
-                } else {
-                    if (table.get(0).size() == 5) {
-                        ObjectNode jsonNodes = output.addObject();
-                        jsonNodes.put("command", action.getCommand());
-                        jsonNodes.put("handIdx", action.getHandIdx());
-                        jsonNodes.put("error", "Cannot place card on table since row is full.");
-                        return 0;
-                    }
-                    table.get(0).add(card);
-                }
-                cardsHand2.remove(index);
-                return card.getMana();
+                return SmallFunctions.idk(output, action, cardsHand2, table, index, manamax2,
+                                          maxCol, row0, row1);
             }
             default -> {
                 return 0;
@@ -217,25 +163,35 @@ public final class OutPrint {
         }
     }
 
+    /**
+     *
+     * @param output
+     * @param action
+     * @param nrCase
+     */
     public static void printErrorEnvironment(final ArrayNode output, final ActionsInput action,
                                              final int nrCase) {
+        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4;
+
         ObjectNode jsonNodes = output.addObject();
         jsonNodes.put("command", action.getCommand());
         jsonNodes.put("handIdx", action.getHandIdx());
         jsonNodes.put("affectedRow", action.getAffectedRow());
 
         switch (nrCase) {
-            case 1 -> {
+            case case1 -> {
                 jsonNodes.put("error", "Chosen card is not of type environment.");
             }
-            case 2 -> {
+            case case2 -> {
                 jsonNodes.put("error", "Not enough mana to use environment card.");
             }
-            case 3 -> {
+            case case3 -> {
                 jsonNodes.put("error", "Chosen row does not belong to the enemy.");
             }
-            case 4 -> {
+            case case4 -> {
                 jsonNodes.put("error", "Cannot steal enemy card since the player's row is full.");
+            }
+            default -> {
             }
         }
 

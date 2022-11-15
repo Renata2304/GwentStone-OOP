@@ -1,6 +1,5 @@
 package fileio;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import functions.OutPrint;
@@ -121,41 +120,54 @@ public final class CardInput {
         return true;
     }
 
+    /**
+     *
+     * @param output
+     * @param action
+     * @param playerTurn
+     * @param table
+     * @param cardsHand1
+     * @param cardsHand2
+     * @param mana1
+     * @param mana2
+     * @return
+     */
     public static int testCardEnvironment(final ArrayNode output, final ActionsInput
             action, final int playerTurn, final ArrayList<ArrayList<CardInput>> table,
             final ArrayList<CardInput> cardsHand1, final ArrayList<CardInput> cardsHand2,
             final int mana1, final int mana2) {
+        final int case1 = 1, case2 = 2, case3 = 3;
         switch (playerTurn) {
             case 1 -> {
                 if (action.getHandIdx() > cardsHand1.size()) {
                     return 0;
                 }
                 CardInput cardenv = cardsHand1.get(action.getHandIdx());
-                if (!Objects.equals(cardenv.getType(cardenv),"Environment")) {
-                    OutPrint.printErrorEnvironment(output, action, 1);
+                if (!Objects.equals(cardenv.getType(cardenv), "Environment")) {
+                    OutPrint.printErrorEnvironment(output, action, case1);
                     return 0;
                 }
                 if (cardenv.getMana() > mana1) {
-                    OutPrint.printErrorEnvironment(output, action, 2);
+                    OutPrint.printErrorEnvironment(output, action, case2);
                     return 0;
                 }
-                if (action.getAffectedRow() == 2 || action.getAffectedRow() == 3) {
-                    OutPrint.printErrorEnvironment(output, action, 3);
+                if (action.getAffectedRow() == 2 || action.getAffectedRow() == case3) {
+                    OutPrint.printErrorEnvironment(output, action, case3);
                     return 0;
                 }
-                if (Objects.equals(cardenv.getName(),"Heart Hound")) {
+                if (Objects.equals(cardenv.getName(), "Heart Hound")) {
                     if (heartHound(output, action, table)) {
                         cardsHand1.remove(cardenv);
                         return cardenv.getMana();
                     }
                     return 0;
                 }
-                if (Objects.equals(cardenv.getName(),"Firestorm")) {
+                if (Objects.equals(cardenv.getName(), "Firestorm")) {
                     firestorm(action, table);
                     cardsHand1.remove(cardenv);
                     return cardenv.getMana();
                 }
-                if (Objects.equals(cardenv.getName(),"Winterfell")) {
+                if (Objects.equals(cardenv.getName(), "Winterfell")) {
                     winterfell(action, table);
                     cardsHand1.remove(cardenv);
                     return cardenv.getMana();
@@ -167,31 +179,31 @@ public final class CardInput {
                     return 0;
                 }
                 CardInput cardenv = cardsHand2.get(action.getHandIdx());
-                if (!Objects.equals(cardenv.getType(cardenv),"Environment")) {
-                    OutPrint.printErrorEnvironment(output, action, 1);
+                if (!Objects.equals(cardenv.getType(cardenv), "Environment")) {
+                    OutPrint.printErrorEnvironment(output, action, case1);
                     return 0;
                 }
                 if (cardenv.getMana() > mana2) {
-                    OutPrint.printErrorEnvironment(output, action, 2);
+                    OutPrint.printErrorEnvironment(output, action, case2);
                     return 0;
                 }
                 if (action.getAffectedRow() == 0 || action.getAffectedRow() == 1) {
-                    OutPrint.printErrorEnvironment(output, action, 3);
+                    OutPrint.printErrorEnvironment(output, action, case3);
                     return 0;
                 }
-                if (Objects.equals(cardenv.getName(),"Heart Hound")) {
+                if (Objects.equals(cardenv.getName(), "Heart Hound")) {
                     if (heartHound(output, action, table)) {
                         cardsHand2.remove(cardenv);
                         return cardenv.getMana();
                     }
                     return 0;
                 }
-                if (Objects.equals(cardenv.getName(),"Firestorm")) {
+                if (Objects.equals(cardenv.getName(), "Firestorm")) {
                     firestorm(action, table);
                     cardsHand2.remove(cardenv);
                     return cardenv.getMana();
                 }
-                if (Objects.equals(cardenv.getName(),"Winterfell")) {
+                if (Objects.equals(cardenv.getName(), "Winterfell")) {
                     winterfell(action, table);
                     cardsHand2.remove(cardenv);
                     return cardenv.getMana();
@@ -204,6 +216,11 @@ public final class CardInput {
         }
     }
 
+    /**
+     *
+     * @param action
+     * @param table
+     */
     public static void firestorm(final ActionsInput action,
                                  final ArrayList<ArrayList<CardInput>> table) {
         for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
@@ -215,15 +232,30 @@ public final class CardInput {
             }
         }
     }
+
+    /**
+     *
+     * @param action
+     * @param table
+     */
     public static void winterfell(final ActionsInput action,
                                   final ArrayList<ArrayList<CardInput>> table) {
         for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
             table.get(action.getAffectedRow()).get(i).setFrozen(true);
         }
     }
+
+    /**
+     *
+     * @param output
+     * @param action
+     * @param table
+     * @return
+     */
     public static boolean heartHound(final ArrayNode output, final ActionsInput
             action, final ArrayList<ArrayList<CardInput>> table) {
-        int currRow = 3 - action.getAffectedRow(); final int maxRow = 5;
+        final int maxRow = 5, maxCol = 3, case4 = 4;
+        int currRow = maxCol - action.getAffectedRow();
         if (table.get(currRow).size() < maxRow) {
             CardInput cardStolen = table.get(action.getAffectedRow()).get(0);
             for (int i = 1; i < table.get(action.getAffectedRow()).size(); i++) {
@@ -235,7 +267,7 @@ public final class CardInput {
             table.get(currRow).add(cardStolen);
             return true;
         } else {
-            OutPrint.printErrorEnvironment(output, action, 4);
+            OutPrint.printErrorEnvironment(output, action, case4);
             return false;
         }
 
@@ -259,10 +291,7 @@ public final class CardInput {
     }
 
     /**
-     * Function that deep copies every field of a card from a deck into a new card
-     * @param deck
-     * @param i
-     * @return
+     *
      */
     public CardInput copyOneCard(final ArrayList<CardInput> deck, final int i) {
         CardInput card = new CardInput();
