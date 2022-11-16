@@ -37,6 +37,9 @@
   "command" : "getPlayerTurn",
   "output" : 2
 }, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
+}, {
   "command" : "getEnvironmentCardsInHand",
   "playerIdx" : 2,
   "output" : [ ]
@@ -58,12 +61,18 @@
     "name" : "Berserker"
   }
 }, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
+}, {
   "command" : "getPlayerMana",
   "playerIdx" : 2,
   "output" : 1
 }, {
   "command" : "getEnvironmentCardsInHand",
   "playerIdx" : 1,
+  "output" : [ ]
+}, {
+  "command" : "getFrozenCardsOnTable",
   "output" : [ ]
 }, {
   "command" : "getCardsOnTable",
@@ -142,6 +151,12 @@
     "name" : "Heart Hound"
   } ]
 }, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
+}, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
+}, {
   "command" : "getPlayerTurn",
   "output" : 1
 }, {
@@ -162,6 +177,9 @@
   "command" : "getPlayerMana",
   "playerIdx" : 2,
   "output" : 3
+}, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
 }, {
   "command" : "getPlayerTurn",
   "output" : 2
@@ -185,6 +203,9 @@
     "name" : "Warden"
   }
 }, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
+}, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,
   "output" : 0
@@ -197,6 +218,9 @@
     "colors" : [ "Green", "Black" ],
     "name" : "Heart Hound"
   } ]
+}, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
 }, {
   "command" : "getCardAtPosition",
   "output" : {

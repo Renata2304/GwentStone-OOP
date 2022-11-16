@@ -1,4 +1,4 @@
 Starting audit...
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\main\Main.java:75:5: Method length is 179 lines (max allowed is 150). [MethodLength]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\main\Main.java:75:5: Method length is 191 lines (max allowed is 150). [MethodLength]
 Audit done.
 Checkstyle ends with 1 errors.

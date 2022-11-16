@@ -32,6 +32,9 @@
   "playerIdx" : 1,
   "output" : [ ]
 }, {
+  "command" : "getFrozenCardsOnTable",
+  "output" : [ ]
+}, {
   "command" : "getPlayerTurn",
   "output" : 1
 }, {

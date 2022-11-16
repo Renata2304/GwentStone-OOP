@@ -244,6 +244,18 @@ public final class Main {
                             jsonNodes.put("output", "No card at that position.");
                         }
                     }
+                    case "getFrozenCardsOnTable" -> {
+                        ObjectNode jsonNodes = output.addObject();
+                        jsonNodes.put("command", action.getCommand());
+                        ArrayNode arrayNode = jsonNodes.putArray("output");
+                        for (int row = 0; row < rowsmax; row++) {
+                            for (int poz = 0; poz < table.get(row).size(); poz++) {
+                                if (table.get(row).get(poz).isFrozen()) {
+                                  OutPrint.printCard(objectMapper, arrayNode, table.get(row), poz);
+                                }
+                            }
+                        }
+                    }
                     default -> {
                     }
                 }
