@@ -18,6 +18,7 @@ public final class CardInput {
     private String name;
     private boolean frozen = false;
     private boolean hasAttacked = false;
+    static final int ROW0 = 0, ROW1 = 1, ROW2 = 2, ROW3 = 3;
 
     public CardInput() {
     }
@@ -91,11 +92,13 @@ public final class CardInput {
      * @param card
      * @return
      */
-    public boolean isTank(CardInput card) {
-        if(Objects.equals(card.getName(), "Goliath"))
+    public boolean isTank(final CardInput card) {
+        if (Objects.equals(card.getName(), "Goliath")) {
             return true;
-        if(Objects.equals(card.getName(), "Warden"))
+        }
+        if (Objects.equals(card.getName(), "Warden")) {
             return true;
+        }
         return false;
     }
 
@@ -161,12 +164,12 @@ public final class CardInput {
                         final ArrayList<CardInput> cardsHand2) {
         switch (playerTurn) {
             case 1 -> {
-                return SmallFunctions.testErrorEnvironment(output, action, table, player, 0, 1,
-                        cardsHand1);
+                return SmallFunctions.testErrorEnvironment(output, action, table, player,
+                        ROW0, ROW1, cardsHand1);
             }
             case 2 -> {
-                return SmallFunctions.testErrorEnvironment(output, action, table, player, 2, 3,
-                        cardsHand2);
+                return SmallFunctions.testErrorEnvironment(output, action, table, player,
+                        ROW2, ROW3, cardsHand2);
             }
             default -> {
                 return 0;
@@ -194,12 +197,12 @@ public final class CardInput {
                   yAttacked = action.getCardAttacked().getY();
         if (game.getPlayerTurn() == 1) {
             // error 1
-            if (xAttacked == 2 || xAttacked == 3) {
+            if (xAttacked == ROW2 || xAttacked == ROW3) {
                 OutPrint.printErrorAttack(objectMapper, output, action, case1);
                 return;
             }
             // error 2
-            if(cardAttacker.isHasAttacked()) {
+            if (cardAttacker.isHasAttacked()) {
                 OutPrint.printErrorAttack(objectMapper, output, action, case2);
                 return;
             }
@@ -223,12 +226,12 @@ public final class CardInput {
             return;
         } else {
             // error 1
-            if (xAttacked == 0 || xAttacked == 1) {
+            if (xAttacked == ROW0 || xAttacked == ROW1) {
                 OutPrint.printErrorAttack(objectMapper, output, action, case1);
                 return;
             }
             // error 2
-            if(cardAttacker.isHasAttacked()) {
+            if (cardAttacker.isHasAttacked()) {
                 OutPrint.printErrorAttack(objectMapper, output, action, case2);
                 return;
             }
@@ -253,28 +256,34 @@ public final class CardInput {
         }
     }
 
+    /**
+     *
+     * @param table
+     * @param game
+     * @return
+     */
     public static boolean testIfThereAreTanks(final ArrayList<ArrayList<CardInput>> table,
                                               final GameInput game) {
         if (game.getPlayerTurn() == 1) {
-            for (int y = 0; y < table.get(0).size(); y++) {
-                if (table.get(0).get(y).isTank(table.get(0).get(y))) {
+            for (int y = 0; y < table.get(ROW0).size(); y++) {
+                if (table.get(ROW0).get(y).isTank(table.get(ROW0).get(y))) {
                     return true;
                 }
             }
-            for (int y = 0; y < table.get(1).size(); y++) {
-                if (table.get(1).get(y).isTank(table.get(1).get(y))) {
+            for (int y = 0; y < table.get(ROW1).size(); y++) {
+                if (table.get(ROW1).get(y).isTank(table.get(ROW1).get(y))) {
                     return true;
                 }
             }
             return false;
         } else {
-            for (int y = 0; y < table.get(2).size(); y++) {
-                if (table.get(2).get(y).isTank(table.get(2).get(y))) {
+            for (int y = 0; y < table.get(ROW2).size(); y++) {
+                if (table.get(ROW2).get(y).isTank(table.get(ROW2).get(y))) {
                     return true;
                 }
             }
-            for (int y = 0; y < table.get(3).size(); y++) {
-                if (table.get(3).get(y).isTank(table.get(3).get(y))) {
+            for (int y = 0; y < table.get(ROW3).size(); y++) {
+                if (table.get(ROW3).get(y).isTank(table.get(ROW3).get(y))) {
                     return true;
                 }
             }

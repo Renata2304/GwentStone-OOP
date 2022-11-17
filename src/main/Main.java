@@ -6,11 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import checker.CheckerConstants;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.*;
-//import functions.ForActions;
 import functions.ForActions;
-import functions.OutPrint;
 
 import java.util.ArrayList;
 
@@ -120,7 +117,7 @@ public final class Main {
             player2.getDeck().remove(0);
             // going through actions
             for (ActionsInput action : game.getActions()) {
-                ForActions.forAc(output, game, action,objectMapper, table, player1, player2,
+                ForActions.forAc(output, game, action, objectMapper, table, player1, player2,
                                  startPlayer);
             }
         }

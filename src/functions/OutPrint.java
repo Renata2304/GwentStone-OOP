@@ -227,7 +227,7 @@ public final class OutPrint {
                 jsonNodes.put("error", "Attacker card is frozen.");
             }
             case case4 -> {
-                jsonNodes.put("error", "Attacked card is not of type 'Tank’.");
+                jsonNodes.put("error", "Attacked card is not of type 'Tank'.");
             }
             default -> {
             }

@@ -2,12 +2,13 @@ package functions;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fileio.*;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import fileio.ActionsInput;
 import fileio.CardInput;
+import fileio.GameInput;
+import fileio.Player;
 
 import java.util.ArrayList;
 
@@ -27,10 +28,10 @@ public final class ForActions {
      * @param startPlayer
      */
     public static void forAc(final ArrayNode output, final GameInput game,
-            final ActionsInput action, final ObjectMapper objectMapper,
-            final ArrayList<ArrayList<CardInput>> table, final Player player1,
-            final Player player2, final int startPlayer) {
-        CardInput copy1, copy2;final int manaMax = 10, rowsmax = 4;
+                             final ActionsInput action, final ObjectMapper objectMapper,
+                             final ArrayList<ArrayList<CardInput>> table, final Player player1,
+                             final Player player2, final int startPlayer) {
+        final int manaMax = 10, rowsmax = 4;
         switch (action.getCommand()) {
                 case "getPlayerDeck" -> {
                     OutPrint.printPlayerDeck(output, objectMapper, player1.getDeck(),
@@ -50,8 +51,10 @@ public final class ForActions {
                     game.setEndTurn(game.getEndTurn() + 1);
                     if (game.getPlayerTurn() == 1) {
                         SmallFunctions.unfreezeCards(table, 2, 3);
+                        SmallFunctions.resetAttack(table, 2, 3);
                     } else {
                         SmallFunctions.unfreezeCards(table, 1, 0);
+                        SmallFunctions.resetAttack(table, 1, 0);
                     }
                     // if they have to both take cards
                     if (game.getEndTurn() % 2 == 0) {
@@ -66,7 +69,7 @@ public final class ForActions {
                         player2.setMana(player2.getMana() + OutPrint.incMana(player2.getMana(),
                                 game.getEndTurn(), manaMax));
                     } else {
-                        // if they don't have to take cards, we're just going to change player's turn
+                     // if they don't have to take cards, we're just going to change player's turn
                         if (game.getPlayerTurn() == 1) {
                             game.setPlayerTurn(2);
                         } else {
@@ -172,8 +175,6 @@ public final class ForActions {
                 }
                 case "cardUsesAttack" -> {
                     CardInput.testCardAttack(output, objectMapper, game, action, table);
-                    table.get(action.getCardAttacker().getX()).
-                            get(action.getCardAttacker().getY()).setHasAttacked(false);
                 }
                 default -> {
                 }

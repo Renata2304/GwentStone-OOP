@@ -30,7 +30,7 @@ public final class GameInput {
                 return endTurn;
         }
 
-        public void setEndTurn(int endTurn) {
+        public void setEndTurn(final int endTurn) {
                 this.endTurn = endTurn;
         }
 

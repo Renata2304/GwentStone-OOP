@@ -57,7 +57,18 @@
     "x" : 3,
     "y" : 0
   },
-  "error" : "Attacked card is not of type 'Tank’."
+  "error" : "Attacked card is not of type 'Tank'."
+}, {
+  "command" : "cardUsesAttack",
+  "cardAttacker" : {
+    "x" : 0,
+    "y" : 1
+  },
+  "cardAttacked" : {
+    "x" : 2,
+    "y" : 0
+  },
+  "error" : "Attacker card has already attacked this turn."
 }, {
   "command" : "cardUsesAttack",
   "cardAttacker" : {
@@ -103,7 +114,7 @@
   } ], [ ], [ {
     "mana" : 4,
     "attackDamage" : 2,
-    "health" : 3,
+    "health" : 5,
     "description" : "Premium card: No matter how many, his body will fight. Save your breath for the Mountain is strong.",
     "colors" : [ "Red", "Purple" ],
     "name" : "Goliath"

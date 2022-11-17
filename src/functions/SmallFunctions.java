@@ -13,16 +13,42 @@ public final class SmallFunctions {
 
     private SmallFunctions() { }
 
-    public static void unfreezeCards(ArrayList<ArrayList<CardInput>> table,
+    /**
+     *
+     * @param table
+     * @param frontRow
+     * @param backRow
+     */
+    public static void unfreezeCards(final ArrayList<ArrayList<CardInput>> table,
                                      final int frontRow, final int backRow) {
-        for( int i = 0; i < table.get(frontRow).size(); i++) {
-            if(table.get(frontRow).get(i).isFrozen()) {
+        for (int i = 0; i < table.get(frontRow).size(); i++) {
+            if (table.get(frontRow).get(i).isFrozen()) {
                 table.get(frontRow).get(i).setFrozen(false);
             }
         }
-        for( int i = 0; i < table.get(backRow).size(); i++) {
-            if(table.get(backRow).get(i).isFrozen()) {
+        for (int i = 0; i < table.get(backRow).size(); i++) {
+            if (table.get(backRow).get(i).isFrozen()) {
                 table.get(backRow).get(i).setFrozen(false);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param table
+     * @param frontRow
+     * @param backRow
+     */
+    public static void resetAttack(final ArrayList<ArrayList<CardInput>> table,
+                                     final int frontRow, final int backRow) {
+        for (int i = 0; i < table.get(frontRow).size(); i++) {
+            if (table.get(frontRow).get(i).isHasAttacked()) {
+                table.get(frontRow).get(i).setHasAttacked(false);
+            }
+        }
+        for (int i = 0; i < table.get(backRow).size(); i++) {
+            if (table.get(backRow).get(i).isHasAttacked()) {
+                table.get(backRow).get(i).setHasAttacked(false);
             }
         }
     }
@@ -31,7 +57,7 @@ public final class SmallFunctions {
      *
      * @param player
      */
-    public static void deleteOneCard(Player player) {
+    public static void deleteOneCard(final Player player) {
         if (!player.getDeck().isEmpty()) {
             CardInput copy = new CardInput();
             copy = copy.copyOneCard(player.getDeck(), 0);
@@ -139,9 +165,9 @@ public final class SmallFunctions {
      * @return
      */
     public static int testErrorEnvironment(final ArrayNode output, final ActionsInput action,
-                                           final ArrayList<ArrayList<CardInput>> table,
-                                           final Player player, final int rowFront, final int rowBack,
-                                           final ArrayList<CardInput> cardsHand) {
+                                  final ArrayList<ArrayList<CardInput>> table, final Player player,
+                                  final int rowFront, final int rowBack, final ArrayList<CardInput>
+                                  cardsHand) {
         final int case1 = 1, case2 = 2, case3 = 3, maxrows = 3;
         if (action.getHandIdx() >= cardsHand.size()) {
             return 0;
