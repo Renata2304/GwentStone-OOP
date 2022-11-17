@@ -195,6 +195,13 @@ public final class OutPrint {
 
     }
 
+    /**
+     *
+     * @param objectMapper
+     * @param output
+     * @param action
+     * @param nrCase
+     */
     public static void printErrorAttack(final ObjectMapper objectMapper, final ArrayNode output,
                                         final ActionsInput action, final int nrCase) {
         final int case1 = 1, case2 = 2, case3 = 3, case4 = 4, case5 = 5;
@@ -211,18 +218,15 @@ public final class OutPrint {
 
         switch (nrCase) {
             case case1 -> {
-                jsonNodes.put("error", "Attacker card is frozen.");
+                jsonNodes.put("error", "Attacked card does not belong to the enemy.");
             }
             case case2 -> {
                 jsonNodes.put("error", "Attacker card has already attacked this turn.");
             }
             case case3 -> {
-                jsonNodes.put("error", "Attacked card does not belong to the current player.");
+                jsonNodes.put("error", "Attacker card is frozen.");
             }
             case case4 -> {
-                jsonNodes.put("error", "Attacked card does not belong to the enemy.");
-            }
-            case case5 -> {
                 jsonNodes.put("error", "Attacked card is not of type 'Tank’.");
             }
             default -> {

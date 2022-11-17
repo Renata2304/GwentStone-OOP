@@ -120,7 +120,8 @@ public final class Main {
             player2.getDeck().remove(0);
             // going through actions
             for (ActionsInput action : game.getActions()) {
-                ForActions.forAc(output, game, action,objectMapper, table, player1, player2, startPlayer);
+                ForActions.forAc(output, game, action,objectMapper, table, player1, player2,
+                                 startPlayer);
             }
         }
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();

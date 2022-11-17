@@ -14,6 +14,18 @@ import java.util.ArrayList;
 public final class ForActions {
 
     private ForActions() { }
+
+    /**
+     *
+     * @param output
+     * @param game
+     * @param action
+     * @param objectMapper
+     * @param table
+     * @param player1
+     * @param player2
+     * @param startPlayer
+     */
     public static void forAc(final ArrayNode output, final GameInput game,
             final ActionsInput action, final ObjectMapper objectMapper,
             final ArrayList<ArrayList<CardInput>> table, final Player player1,
@@ -36,31 +48,25 @@ public final class ForActions {
                 }
                 case "endPlayerTurn" -> {
                     game.setEndTurn(game.getEndTurn() + 1);
+                    if (game.getPlayerTurn() == 1) {
+                        SmallFunctions.unfreezeCards(table, 2, 3);
+                    } else {
+                        SmallFunctions.unfreezeCards(table, 1, 0);
+                    }
                     // if they have to both take cards
                     if (game.getEndTurn() % 2 == 0) {
                         // removing the card taken from the deck
-                        if (!player1.getDeck().isEmpty()) {
-                            copy1 = new CardInput();
-                            copy1 = copy1.copyOneCard(player1.getDeck(), 0);
-                            player1.getHand().add(copy1);
-                            player1.getDeck().remove(0);
-                        }
+                        SmallFunctions.deleteOneCard(player1);
                         // removing the card taken from the deck
-                        if (!player2.getDeck().isEmpty()) {
-                            copy2 = new CardInput();
-                            copy2 = copy2.copyOneCard(player2.getDeck(), 0);
-                            player2.getHand().add(copy2);
-                            player2.getDeck().remove(0);
-                        }
+                        SmallFunctions.deleteOneCard(player2);
                         game.setPlayerTurn(startPlayer);
                         // TODO
                         player1.setMana(player1.getMana()
                                 + OutPrint.incMana(player1.getMana(), game.getEndTurn(), manaMax));
                         player2.setMana(player2.getMana() + OutPrint.incMana(player2.getMana(),
                                 game.getEndTurn(), manaMax));
-                        ;
                     } else {
-                     // if they don't have to take cards, we're just going to change player's turn
+                        // if they don't have to take cards, we're just going to change player's turn
                         if (game.getPlayerTurn() == 1) {
                             game.setPlayerTurn(2);
                         } else {
@@ -84,13 +90,14 @@ public final class ForActions {
                     }
                 }
                 case "getCardsInHand" -> {
-                    OutPrint.printPlayerDeck(output, objectMapper, player1.getHand(), player2.getHand(),
-                            action, player1.getHand().size(), player2.getHand().size());
+                    OutPrint.printPlayerDeck(output, objectMapper, player1.getHand(),
+                            player2.getHand(), action, player1.getHand().size(),
+                            player2.getHand().size());
                 }
                 case "placeCard" -> {
-                    int mana = OutPrint.addRow(output, action, player1.getHand(), player2.getHand(), table,
-                            game.getPlayerTurn(), action.getHandIdx(), player1.getMana(),
-                            player2.getMana());
+                    int mana = OutPrint.addRow(output, action, player1.getHand(), player2.
+                            getHand(), table, game.getPlayerTurn(), action.getHandIdx(),
+                            player1.getMana(), player2.getMana());
                     if (mana != 0 && game.getPlayerTurn() == 1) {
                         player1.setMana(player1.getMana() - mana);
                     } else if (mana != 0 && game.getPlayerTurn() == 2) {
@@ -116,11 +123,11 @@ public final class ForActions {
                 case "useEnvironmentCard" -> {
                     int mana;
                     if (game.getPlayerTurn() == 1) {
-                        mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(), table,
-                                player1, player1.getHand(), player2.getHand());
+                        mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(),
+                                table, player1, player1.getHand(), player2.getHand());
                     } else {
-                        mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(), table,
-                                player2, player1.getHand(), player2.getHand());
+                        mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(),
+                                table, player2, player1.getHand(), player2.getHand());
                     }
                     if (mana != 0) {
                         if (game.getPlayerTurn() == 1) {
@@ -164,7 +171,9 @@ public final class ForActions {
                     }
                 }
                 case "cardUsesAttack" -> {
-
+                    CardInput.testCardAttack(output, objectMapper, game, action, table);
+                    table.get(action.getCardAttacker().getX()).
+                            get(action.getCardAttacker().getY()).setHasAttacked(false);
                 }
                 default -> {
                 }

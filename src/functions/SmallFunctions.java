@@ -13,6 +13,33 @@ public final class SmallFunctions {
 
     private SmallFunctions() { }
 
+    public static void unfreezeCards(ArrayList<ArrayList<CardInput>> table,
+                                     final int frontRow, final int backRow) {
+        for( int i = 0; i < table.get(frontRow).size(); i++) {
+            if(table.get(frontRow).get(i).isFrozen()) {
+                table.get(frontRow).get(i).setFrozen(false);
+            }
+        }
+        for( int i = 0; i < table.get(backRow).size(); i++) {
+            if(table.get(backRow).get(i).isFrozen()) {
+                table.get(backRow).get(i).setFrozen(false);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param player
+     */
+    public static void deleteOneCard(Player player) {
+        if (!player.getDeck().isEmpty()) {
+            CardInput copy = new CardInput();
+            copy = copy.copyOneCard(player.getDeck(), 0);
+            player.getHand().add(copy);
+            player.getDeck().remove(0);
+        }
+    }
+
     /**
      *
      * @param output
@@ -115,7 +142,7 @@ public final class SmallFunctions {
                                            final ArrayList<ArrayList<CardInput>> table,
                                            final Player player, final int rowFront, final int rowBack,
                                            final ArrayList<CardInput> cardsHand) {
-        final int case1 = 1, case2 = 2, case3 = 3;
+        final int case1 = 1, case2 = 2, case3 = 3, maxrows = 3;
         if (action.getHandIdx() >= cardsHand.size()) {
             return 0;
         }
@@ -128,7 +155,8 @@ public final class SmallFunctions {
             OutPrint.printErrorEnvironment(output, action, case2);
             return 0;
         }
-        if (action.getAffectedRow() == 3 - rowFront || action.getAffectedRow() == 3 - rowBack) {
+        if (action.getAffectedRow() == maxrows - rowFront
+                || action.getAffectedRow() == maxrows - rowBack) {
             OutPrint.printErrorEnvironment(output, action, case3);
             return 0;
         }

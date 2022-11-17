@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public final class Player {
     private int mana;
-    ArrayList<CardInput> deck;
-    ArrayList<CardInput> hand;
-    CardInput cardHero;
+    private ArrayList<CardInput> deck;
+    private ArrayList<CardInput> hand;
+    private CardInput cardHero;
 
     public int getMana() {
         return mana;

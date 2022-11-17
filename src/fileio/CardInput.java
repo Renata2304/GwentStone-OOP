@@ -1,5 +1,6 @@
 package fileio;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import functions.OutPrint;
@@ -90,6 +91,19 @@ public final class CardInput {
      * @param card
      * @return
      */
+    public boolean isTank(CardInput card) {
+        if(Objects.equals(card.getName(), "Goliath"))
+            return true;
+        if(Objects.equals(card.getName(), "Warden"))
+            return true;
+        return false;
+    }
+
+    /**
+     *
+     * @param card
+     * @return
+     */
     public String getType(final CardInput card) {
         if (Objects.equals(card.name, "Sentinel") || Objects.equals(card.name, "Berserker")
             || Objects.equals(card.name, "Goliath") || Objects.equals(card.name, "Warden")
@@ -160,10 +174,112 @@ public final class CardInput {
         }
     }
 
-    public static void testCardAttack(final ArrayNode output, final ActionsInput
-            action, final int playerTurn, final ArrayList<ArrayList<CardInput>> table,
-            final ArrayList<CardInput> cardsHand1, final ArrayList<CardInput> cardsHand2) {
-        //if ()
+    /**
+     *
+     * @param output
+     * @param objectMapper
+     * @param game
+     * @param action
+     * @param table
+     */
+    public static void testCardAttack(final ArrayNode output, final ObjectMapper objectMapper,
+            final GameInput game, final ActionsInput action, final ArrayList<ArrayList<CardInput>>
+            table) {
+        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4;
+        CardInput cardAttacker = table.get(action.getCardAttacker().getX()).
+                get(action.getCardAttacker().getY());
+        CardInput cardAttacked = table.get(action.getCardAttacked().getX()).
+                get(action.getCardAttacked().getY());
+        final int xAttacked = action.getCardAttacked().getX(),
+                  yAttacked = action.getCardAttacked().getY();
+        if (game.getPlayerTurn() == 1) {
+            // error 1
+            if (xAttacked == 2 || xAttacked == 3) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case1);
+                return;
+            }
+            // error 2
+            if(cardAttacker.isHasAttacked()) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case2);
+                return;
+            }
+            // error 3
+            if (cardAttacker.isFrozen()) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case3);
+                return;
+            }
+            // error 4
+            if (!cardAttacked.isTank(cardAttacked)
+                    && testIfThereAreTanks(table, game)) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case4);
+                return;
+            }
+            // good test
+            cardAttacked.setHealth(cardAttacked.getHealth() - cardAttacker.getAttackDamage());
+            if (cardAttacked.getHealth() <= 0) {
+                table.get(xAttacked).remove(yAttacked);
+            }
+            cardAttacker.setHasAttacked(true);
+            return;
+        } else {
+            // error 1
+            if (xAttacked == 0 || xAttacked == 1) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case1);
+                return;
+            }
+            // error 2
+            if(cardAttacker.isHasAttacked()) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case2);
+                return;
+            }
+            // error 3
+            if (cardAttacker.isFrozen()) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case3);
+                return;
+            }
+            // error 4
+            if (!cardAttacked.isTank(cardAttacked)
+                    && testIfThereAreTanks(table, game)) {
+                OutPrint.printErrorAttack(objectMapper, output, action, case4);
+                return;
+            }
+            // good test
+            cardAttacked.setHealth(cardAttacked.getHealth() - cardAttacker.getAttackDamage());
+            if (cardAttacked.getHealth() <= 0) {
+                table.get(xAttacked).remove(yAttacked);
+            }
+            cardAttacker.setHasAttacked(true);
+            return;
+        }
+    }
+
+    public static boolean testIfThereAreTanks(final ArrayList<ArrayList<CardInput>> table,
+                                              final GameInput game) {
+        if (game.getPlayerTurn() == 1) {
+            for (int y = 0; y < table.get(0).size(); y++) {
+                if (table.get(0).get(y).isTank(table.get(0).get(y))) {
+                    return true;
+                }
+            }
+            for (int y = 0; y < table.get(1).size(); y++) {
+                if (table.get(1).get(y).isTank(table.get(1).get(y))) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            for (int y = 0; y < table.get(2).size(); y++) {
+                if (table.get(2).get(y).isTank(table.get(2).get(y))) {
+                    return true;
+                }
+            }
+            for (int y = 0; y < table.get(3).size(); y++) {
+                if (table.get(3).get(y).isTank(table.get(3).get(y))) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /**
@@ -254,8 +370,6 @@ public final class CardInput {
 
         return card;
     }
-
-    //public CardInput cardFrozen()
 
     @Override
     public String toString() {
