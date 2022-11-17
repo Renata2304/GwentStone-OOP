@@ -3,6 +3,7 @@ package fileio;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import functions.OutPrint;
+import functions.SmallFunctions;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -15,6 +16,7 @@ public final class CardInput {
     private ArrayList<String> colors;
     private String name;
     private boolean frozen = false;
+    private boolean hasAttacked = false;
 
     public CardInput() {
     }
@@ -75,6 +77,14 @@ public final class CardInput {
         this.frozen = frozen;
     }
 
+    public boolean isHasAttacked() {
+        return hasAttacked;
+    }
+
+    public void setHasAttacked(final boolean hasAttacked) {
+        this.hasAttacked = hasAttacked;
+    }
+
     /**
      *
      * @param card
@@ -100,7 +110,7 @@ public final class CardInput {
      * @param manaHand
      * @return
      */
-    public static boolean testCardPlaceCard(final ArrayNode output, final ActionsInput action,
+    public static boolean testErrorCardPlaceCard(final ArrayNode output, final ActionsInput action,
                             final CardInput card, final int manaHand) {
         if (Objects.equals(card.getType(card), "Environment")) {
             ObjectNode jsonNodes = output.addObject();
@@ -129,92 +139,31 @@ public final class CardInput {
      * @param table
      * @param cardsHand1
      * @param cardsHand2
-     * @param mana1
-     * @param mana2
      * @return
      */
-    public static int testCardEnvironment(final ArrayNode output, final ActionsInput
-            action, final int playerTurn, final ArrayList<ArrayList<CardInput>> table,
-            final ArrayList<CardInput> cardsHand1, final ArrayList<CardInput> cardsHand2,
-            final int mana1, final int mana2) {
-        final int case1 = 1, case2 = 2, case3 = 3;
+    public static int testCardEnvironment(final ArrayNode output, final ActionsInput action,
+                        final int playerTurn, final ArrayList<ArrayList<CardInput>> table,
+                        final Player player, final ArrayList<CardInput> cardsHand1,
+                        final ArrayList<CardInput> cardsHand2) {
         switch (playerTurn) {
             case 1 -> {
-                if (action.getHandIdx() > cardsHand1.size()) {
-                    return 0;
-                }
-                CardInput cardenv = cardsHand1.get(action.getHandIdx());
-                if (!Objects.equals(cardenv.getType(cardenv), "Environment")) {
-                    OutPrint.printErrorEnvironment(output, action, case1);
-                    return 0;
-                }
-                if (cardenv.getMana() > mana1) {
-                    OutPrint.printErrorEnvironment(output, action, case2);
-                    return 0;
-                }
-                if (action.getAffectedRow() == 2 || action.getAffectedRow() == case3) {
-                    OutPrint.printErrorEnvironment(output, action, case3);
-                    return 0;
-                }
-                if (Objects.equals(cardenv.getName(), "Heart Hound")) {
-                    if (heartHound(output, action, table)) {
-                        cardsHand1.remove(cardenv);
-                        return cardenv.getMana();
-                    }
-                    return 0;
-                }
-                if (Objects.equals(cardenv.getName(), "Firestorm")) {
-                    firestorm(action, table);
-                    cardsHand1.remove(cardenv);
-                    return cardenv.getMana();
-                }
-                if (Objects.equals(cardenv.getName(), "Winterfell")) {
-                    winterfell(action, table);
-                    cardsHand1.remove(cardenv);
-                    return cardenv.getMana();
-                }
-                return 0;
+                return SmallFunctions.testErrorEnvironment(output, action, table, player, 0, 1,
+                        cardsHand1);
             }
             case 2 -> {
-                if (action.getHandIdx() > cardsHand2.size()) {
-                    return 0;
-                }
-                CardInput cardenv = cardsHand2.get(action.getHandIdx());
-                if (!Objects.equals(cardenv.getType(cardenv), "Environment")) {
-                    OutPrint.printErrorEnvironment(output, action, case1);
-                    return 0;
-                }
-                if (cardenv.getMana() > mana2) {
-                    OutPrint.printErrorEnvironment(output, action, case2);
-                    return 0;
-                }
-                if (action.getAffectedRow() == 0 || action.getAffectedRow() == 1) {
-                    OutPrint.printErrorEnvironment(output, action, case3);
-                    return 0;
-                }
-                if (Objects.equals(cardenv.getName(), "Heart Hound")) {
-                    if (heartHound(output, action, table)) {
-                        cardsHand2.remove(cardenv);
-                        return cardenv.getMana();
-                    }
-                    return 0;
-                }
-                if (Objects.equals(cardenv.getName(), "Firestorm")) {
-                    firestorm(action, table);
-                    cardsHand2.remove(cardenv);
-                    return cardenv.getMana();
-                }
-                if (Objects.equals(cardenv.getName(), "Winterfell")) {
-                    winterfell(action, table);
-                    cardsHand2.remove(cardenv);
-                    return cardenv.getMana();
-                }
-                return 0;
+                return SmallFunctions.testErrorEnvironment(output, action, table, player, 2, 3,
+                        cardsHand2);
             }
             default -> {
                 return 0;
             }
         }
+    }
+
+    public static void testCardAttack(final ArrayNode output, final ActionsInput
+            action, final int playerTurn, final ArrayList<ArrayList<CardInput>> table,
+            final ArrayList<CardInput> cardsHand1, final ArrayList<CardInput> cardsHand2) {
+        //if ()
     }
 
     /**
@@ -305,6 +254,8 @@ public final class CardInput {
 
         return card;
     }
+
+    //public CardInput cardFrozen()
 
     @Override
     public String toString() {

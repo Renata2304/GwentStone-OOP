@@ -5,7 +5,8 @@ import java.util.ArrayList;
 public final class GameInput {
         private StartGameInput startGame;
         private ArrayList<ActionsInput> actions;
-
+        private int endTurn;
+        private int playerTurn;
         public GameInput() {
         }
 
@@ -23,6 +24,22 @@ public final class GameInput {
 
         public void setActions(final ArrayList<ActionsInput> actions) {
                 this.actions = actions;
+        }
+
+        public int getEndTurn() {
+                return endTurn;
+        }
+
+        public void setEndTurn(int endTurn) {
+                this.endTurn = endTurn;
+        }
+
+        public int getPlayerTurn() {
+                return playerTurn;
+        }
+
+        public void setPlayerTurn(final int playerTurn) {
+                this.playerTurn = playerTurn;
         }
 
         @Override
