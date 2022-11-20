@@ -248,7 +248,7 @@
   "command" : "getCardAtPosition",
   "output" : {
     "mana" : 2,
-    "attackDamage" : 7,
+    "attackDamage" : 5,
     "health" : 1,
     "description" : "Standard card: He has seen everything, his mind has never been asleep since the making of the realm.",
     "colors" : [ "Brown", "Blue" ],
@@ -279,7 +279,7 @@
     "name" : "The Ripper"
   } ], [ {
     "mana" : 2,
-    "attackDamage" : 7,
+    "attackDamage" : 5,
     "health" : 1,
     "description" : "Standard card: He has seen everything, his mind has never been asleep since the making of the realm.",
     "colors" : [ "Brown", "Blue" ],

@@ -50,11 +50,9 @@ public final class ForActions {
                 case "endPlayerTurn" -> {
                     game.setEndTurn(game.getEndTurn() + 1);
                     if (game.getPlayerTurn() == 1) {
-                        SmallFunctions.unfreezeCards(table, 2, 3);
-                        SmallFunctions.resetAttack(table, 2, 3);
+                        SmallFunctions.resetCards(table, 2, 3);
                     } else {
-                        SmallFunctions.unfreezeCards(table, 1, 0);
-                        SmallFunctions.resetAttack(table, 1, 0);
+                        SmallFunctions.resetCards(table, 1, 0);
                     }
                     // if they have to both take cards
                     if (game.getEndTurn() % 2 == 0) {
@@ -175,6 +173,9 @@ public final class ForActions {
                 }
                 case "cardUsesAttack" -> {
                     CardInput.testCardAttack(output, objectMapper, game, action, table);
+                }
+                case "cardUsesAbility" -> {
+                    CardInput.testUseAbility(output, objectMapper, game, action, table);
                 }
                 default -> {
                 }

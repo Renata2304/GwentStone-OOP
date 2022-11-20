@@ -1,6 +1,13 @@
 Starting audit...
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\functions\ForActions.java:53:64: '3' is a magic number. [MagicNumber]
-[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\functions\ForActions.java:54:62: '3' is a magic number. [MagicNumber]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:259:5: Missing a Javadoc comment. [MissingJavadocMethod]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:284: Line is longer than 100 characters (found 101). [LineLength]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:313: Line is longer than 100 characters (found 101). [LineLength]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:332:9: switch without "default" clause. [MissingSwitchDefault]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:352:9: 'if' is not followed by whitespace. [WhitespaceAfter]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:355:9: 'if' is not followed by whitespace. [WhitespaceAfter]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\fileio\CardInput.java:400:9: 'if' is not followed by whitespace. [WhitespaceAfter]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\functions\ForActions.java:30:5: Method length is 151 lines (max allowed is 150). [MethodLength]
+[ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\functions\ForActions.java:53:61: '3' is a magic number. [MagicNumber]
 [ERROR] E:\Facultate\Anul 2\Semestrul 1\POO\Tema\tema\.\src\main\Main.java:9:14: Using the '.*' form of import should be avoided - fileio.*. [AvoidStarImport]
 Audit done.
-Checkstyle ends with 3 errors.
+Checkstyle ends with 10 errors.

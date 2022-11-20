@@ -19,34 +19,20 @@ public final class SmallFunctions {
      * @param frontRow
      * @param backRow
      */
-    public static void unfreezeCards(final ArrayList<ArrayList<CardInput>> table,
-                                     final int frontRow, final int backRow) {
+    public static void resetCards(final ArrayList<ArrayList<CardInput>> table,
+                                  final int frontRow, final int backRow) {
         for (int i = 0; i < table.get(frontRow).size(); i++) {
             if (table.get(frontRow).get(i).isFrozen()) {
                 table.get(frontRow).get(i).setFrozen(false);
+            }
+            if (table.get(frontRow).get(i).isHasAttacked()) {
+                table.get(frontRow).get(i).setHasAttacked(false);
             }
         }
         for (int i = 0; i < table.get(backRow).size(); i++) {
             if (table.get(backRow).get(i).isFrozen()) {
                 table.get(backRow).get(i).setFrozen(false);
             }
-        }
-    }
-
-    /**
-     *
-     * @param table
-     * @param frontRow
-     * @param backRow
-     */
-    public static void resetAttack(final ArrayList<ArrayList<CardInput>> table,
-                                     final int frontRow, final int backRow) {
-        for (int i = 0; i < table.get(frontRow).size(); i++) {
-            if (table.get(frontRow).get(i).isHasAttacked()) {
-                table.get(frontRow).get(i).setHasAttacked(false);
-            }
-        }
-        for (int i = 0; i < table.get(backRow).size(); i++) {
             if (table.get(backRow).get(i).isHasAttacked()) {
                 table.get(backRow).get(i).setHasAttacked(false);
             }

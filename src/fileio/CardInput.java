@@ -256,6 +256,106 @@ public final class CardInput {
         }
     }
 
+    public static void testUseAbility(final ArrayNode output, final ObjectMapper objectMapper,
+            final GameInput game, final ActionsInput action, final ArrayList<ArrayList<CardInput>>
+            table) {
+        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4, case5 = 5;
+        CardInput cardAttacker = table.get(action.getCardAttacker().getX()).
+                get(action.getCardAttacker().getY());
+        CardInput cardAttacked = table.get(action.getCardAttacked().getX()).
+                get(action.getCardAttacked().getY());
+
+        if (!testIfSpecialCard(cardAttacker)) {
+            return;
+        }
+
+        if (game.getPlayerTurn() == 1) {
+            // error 1
+            if (cardAttacker.isFrozen()) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case1);
+                return;
+            }
+            // error 2
+            if (cardAttacker.isHasAttacked()) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case2);
+                return;
+            }
+            // error 3
+            if (cardAttacker.getName().equals("Disciple") && (action.getCardAttacked().getX() == ROW0
+                    || action.getCardAttacked().getX() == ROW1)) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case3);
+                return;
+            }
+            // error 4
+            if (!cardAttacker.getName().equals("Disciple")
+                    && (action.getCardAttacked().getX() == ROW2
+                    || action.getCardAttacked().getX() == ROW3)) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case4);
+                return;
+            }
+            // error 5
+            if (!cardAttacked.isTank(cardAttacked) && testIfThereAreTanks(table, game)) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case5);
+                return;
+            }
+        } else {
+            // error 1
+            if (cardAttacker.isFrozen()) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case1);
+                return;
+            }
+            // error 2
+            if (cardAttacker.isHasAttacked()) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case2);
+                return;
+            }
+            // error 3
+            if (cardAttacker.getName().equals("Disciple") && (action.getCardAttacked().getX() == ROW2
+                    || action.getCardAttacked().getX() == ROW3)) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case3);
+                return;
+            }
+            // error 4
+            if (!cardAttacker.getName().equals("Disciple")
+                    && (action.getCardAttacked().getX() == ROW0
+                    || action.getCardAttacked().getX() == ROW1)) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case4);
+                return;
+            }
+            // error 5
+            if (!cardAttacked.isTank(cardAttacked) && testIfThereAreTanks(table, game)) {
+                OutPrint.printErrorAbility(objectMapper, output, action, case5);
+                return;
+            }
+        }
+
+        switch (cardAttacker.getName()) {
+            case "The Ripper" -> {
+                cardAttacked.setAttackDamage(cardAttacked.getAttackDamage() - 2);
+            }
+            case "Miraj" -> {
+                final int aux = cardAttacker.getHealth();
+                cardAttacker.setHealth(cardAttacked.getHealth());
+                cardAttacked.setHealth(aux);
+            }
+            case "The Cursed One" -> {
+                final int aux = cardAttacked.getHealth();
+                cardAttacked.setHealth(cardAttacked.getAttackDamage());
+                cardAttacked.setAttackDamage(aux);
+            }
+            case "Disciple" -> {
+                cardAttacked.setHealth(cardAttacked.getHealth() + 2);
+            }
+        }
+
+        cardAttacker.setHasAttacked(true);
+        if(cardAttacked.getHealth() <= 0) {
+            table.get(action.getCardAttacked().getX()).remove(action.getCardAttacked().getY());
+        }
+        if(cardAttacked.getAttackDamage() < 0) {
+            cardAttacked.setAttackDamage(0);
+        }
+    }
     /**
      *
      * @param table
@@ -289,6 +389,21 @@ public final class CardInput {
             }
             return false;
         }
+    }
+
+    /**
+     *
+     * @param card
+     * @return
+     */
+    public static boolean testIfSpecialCard(final CardInput card) {
+        if(Objects.equals(card.getName(), "Miraj")
+                || Objects.equals(card.getName(), "The Ripper")
+                || Objects.equals(card.getName(), "Disciple")
+                || Objects.equals(card.getName(), "The Cursed One")) {
+            return true;
+        }
+        return false;
     }
 
     /**

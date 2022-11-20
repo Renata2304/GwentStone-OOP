@@ -234,4 +234,47 @@ public final class OutPrint {
         }
     }
 
+    /**
+     *
+     * @param output
+     * @param action
+     * @param nrCase
+     */
+    public static void printErrorAbility(final ObjectMapper objectMapper, final ArrayNode output,
+                                         final ActionsInput action, final int nrCase) {
+        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4, case5 = 5;
+
+        ObjectNode jsonNodes = output.addObject();
+        jsonNodes.put("command", action.getCommand());
+        ObjectNode jsonNodes2 = objectMapper.createObjectNode();
+        jsonNodes.set("cardAttacker", jsonNodes2);
+        jsonNodes2.put("x", action.getCardAttacker().getX());
+        jsonNodes2.put("y", action.getCardAttacker().getY());
+        jsonNodes2 = objectMapper.createObjectNode();
+        jsonNodes.set("cardAttacked", jsonNodes2);
+        jsonNodes2.put("x", action.getCardAttacked().getX());
+        jsonNodes2.put("y", action.getCardAttacked().getY());
+
+        switch (nrCase) {
+            case case1 -> {
+                jsonNodes.put("error", "Attacker card is frozen.");
+            }
+            case case2 -> {
+                jsonNodes.put("error", "Attacker card has already attacked this turn.");
+            }
+            case case3 -> {
+                jsonNodes.put("error", "Attacked card does not belong to the current player.");
+            }
+            case case4 -> {
+                jsonNodes.put("error", "Attacked card does not belong to the enemy.");
+            }
+            case case5 -> {
+                jsonNodes.put("error", "Attacked card is not of type 'Tank'.");
+            }
+            default -> {
+            }
+        }
+
+    }
+
 }
