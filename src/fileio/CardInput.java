@@ -2,7 +2,6 @@ package fileio;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import functions.OutPrint;
 import functions.SmallFunctions;
 
@@ -119,33 +118,6 @@ public final class CardInput {
             return "Environment";
         }
         return "No type";
-    }
-
-    /**
-     *
-     * @param card
-     * @param manaHand
-     * @return
-     */
-    public static boolean testErrorCardPlaceCard(final ArrayNode output, final ActionsInput action,
-                            final CardInput card, final int manaHand) {
-        if (Objects.equals(card.getType(card), "Environment")) {
-            ObjectNode jsonNodes = output.addObject();
-            jsonNodes.put("command", action.getCommand());
-            jsonNodes.put("handIdx", action.getHandIdx());
-            jsonNodes.put("error",
-                    "Cannot place environment card on table.");
-            return false;
-        }
-        if (card.getMana() > manaHand) {
-            ObjectNode jsonNodes = output.addObject();
-            jsonNodes.put("command", action.getCommand());
-            jsonNodes.put("handIdx", action.getHandIdx());
-            jsonNodes.put("error",
-                    "Not enough mana to place card on table.");
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -374,12 +346,27 @@ public final class CardInput {
         }
     }
 
+    /**
+     *
+     * @param output
+     * @param objectMapper
+     * @param game
+     * @param action
+     * @param table
+     * @param player1
+     * @param player2
+     * @return
+     */
     public static int testUseHeroAbility(final ArrayNode output, final ObjectMapper objectMapper,
             final GameInput game, final ActionsInput action, final ArrayList<ArrayList<CardInput>>
             table, final Player player1, final Player player2) {
         final int case1 = 1, case2 = 2, case3 = 3, case4 = 4, maxRow = 3;
-        final int rowFront = SmallFunctions.getFront(game.getPlayerTurn()),
-                  rowBack = SmallFunctions.getBack(game.getPlayerTurn());
+        final int rowFront,  rowBack;
+        if (game.getPlayerTurn() == 1) {
+            rowFront = ROW2; rowBack = ROW3;
+        } else {
+            rowFront = ROW1; rowBack = ROW0;
+        }
         // error 1
         if (game.getPlayerTurn() == 1 && player1.getMana() < player1.getCardHero().getMana()) {
             OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case1);
@@ -391,7 +378,7 @@ public final class CardInput {
         }
 
         CardInput hero;
-        if(game.getPlayerTurn() == 1) {
+        if (game.getPlayerTurn() == 1) {
             hero = player1.getCardHero();
         } else {
             hero = player2.getCardHero();

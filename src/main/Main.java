@@ -6,7 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import checker.CheckerConstants;
-import fileio.*;
+
+import fileio.ActionsInput;
+import fileio.CardInput;
+import fileio.DecksInput;
+import fileio.GameInput;
+import fileio.Input;
+import fileio.Player;
 import functions.ForActions;
 
 import java.util.ArrayList;

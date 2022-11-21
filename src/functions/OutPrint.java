@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.ActionsInput;
 import fileio.CardInput;
+import fileio.GameInput;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public final class OutPrint {
     private OutPrint() { }
@@ -17,12 +19,19 @@ public final class OutPrint {
         return gamesWon;
     }
 
-    public static void setGamesWon(int gamesWon) {
-        gamesWon = gamesWon;
+    public static void setGamesWon(final int gamesWon) {
+        OutPrint.gamesWon = gamesWon;
     }
 
     /**
-     * i dunno 1
+     * Printing every card from a given deck, based on player's turn
+     * @param output
+     * @param objectMapper
+     * @param deck1
+     * @param deck2
+     * @param action
+     * @param nrCards1
+     * @param nrCards2
      */
     public static void printPlayerDeck(final ArrayNode output, final ObjectMapper objectMapper,
                      final ArrayList<CardInput> deck1, final ArrayList<CardInput> deck2,
@@ -52,7 +61,11 @@ public final class OutPrint {
     }
 
     /**
-     * i dunno 2
+     * Printing one card from a given deck.
+     * @param objectMapper
+     * @param arrayNode
+     * @param deck
+     * @param i
      */
     public static void printCard(final ObjectMapper objectMapper, final ArrayNode arrayNode,
                                  final ArrayList<CardInput> deck, final int i) {
@@ -73,13 +86,12 @@ public final class OutPrint {
         arrayNode.add(arrayNode2);
     }
 
-    public static void printCardOnTable(final ObjectMapper objectMapper, final ArrayNode arrayNode,
-                                        final ArrayList<CardInput> row, final int i) {
-
-    }
-
     /**
-     * i dunno 3
+     * Printing one player's hero card.
+     * @param output
+     * @param action
+     * @param objectMapper
+     * @param card
      */
     public static void printPlayerHero(final ArrayNode output, final ActionsInput action,
                        final ObjectMapper objectMapper, final CardInput card) {
@@ -99,31 +111,73 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param cardsHand1
-     * @param cardsHand2
-     * @param playerTurn
+     * Printing a card from the table that can be found at table[X][Y]. If there is no card at that
+     * position, an error will be printed.
+     * @param objectMapper
+     * @param output
+     * @param game
+     * @param action
+     * @param table
      */
-    public static int addRow(final ArrayNode output, final ActionsInput action,
-            final ArrayList<CardInput> cardsHand1, final ArrayList<CardInput> cardsHand2,
-            final ArrayList<ArrayList<CardInput>> table, final int playerTurn, final int index,
-            final int manamax1, final int manamax2) {
-        final int row0 = 0, row1 = 1, row2 = 2, row3 = 3;
-        switch (playerTurn) {
-            case 1 -> {
-                return SmallFunctions.placeCardOnRow(output, action, cardsHand1, table, index,
-                        manamax1, row3, row2);
+    public static void printGetCardAtPosition(final ObjectMapper objectMapper,
+                                              final ArrayNode output, final GameInput game,
+                                              final ActionsInput action,
+                                              final ArrayList<ArrayList<CardInput>> table) {
+        ObjectNode jsonNodes = output.addObject();
+        jsonNodes.put("command", action.getCommand());
+        jsonNodes.put("x", action.getX());
+        jsonNodes.put("y", action.getY());
+        if (action.getY() >= table.get(action.getX()).size()) {
+            jsonNodes.put("output", "No card available at that position.");
+            return;
+        }
+        if (action.getY() < table.get(action.getX()).size()) {
+            ObjectNode jsonNodes2 = objectMapper.createObjectNode();
+            jsonNodes.set("output", jsonNodes2);
+            CardInput card = table.get(action.getX()).get(action.getY());
+            jsonNodes2.put("mana", card.getMana());
+            jsonNodes2.put("attackDamage", card.getAttackDamage());
+            jsonNodes2.put("health", card.getHealth());
+            jsonNodes2.put("description", card.getDescription());
+
+            ArrayNode colors = jsonNodes2.putArray("colors");
+            for (String color : card.getColors()) {
+                colors.add(color);
             }
-            case 2 -> {
-                return SmallFunctions.placeCardOnRow(output, action, cardsHand2, table, index,
-                        manamax2, row0, row1);
-            }
-            default -> {
-                return 0;
-            }
+            jsonNodes2.put("name", card.getName());
+        } else {
+            jsonNodes.put("output", "No card at that position.");
         }
     }
 
+
+    /**
+     *
+     * @param card
+     * @param manaHand
+     * @return
+     */
+    public static boolean printErrorCardPlaceCard(final ArrayNode output,
+                                                  final ActionsInput action,
+                                                  final CardInput card, final int manaHand) {
+        if (Objects.equals(card.getType(card), "Environment")) {
+            ObjectNode jsonNodes = output.addObject();
+            jsonNodes.put("command", action.getCommand());
+            jsonNodes.put("handIdx", action.getHandIdx());
+            jsonNodes.put("error",
+                    "Cannot place environment card on table.");
+            return false;
+        }
+        if (card.getMana() > manaHand) {
+            ObjectNode jsonNodes = output.addObject();
+            jsonNodes.put("command", action.getCommand());
+            jsonNodes.put("handIdx", action.getHandIdx());
+            jsonNodes.put("error",
+                    "Not enough mana to place card on table.");
+            return false;
+        }
+        return true;
+    }
     /**
      *
      * @param output
@@ -425,6 +479,9 @@ public final class OutPrint {
             }
             case case4 -> {
                 jsonNodes.put("error", "Selected row does not belong to the current player.");
+            }
+            default -> {
+
             }
         }
     }

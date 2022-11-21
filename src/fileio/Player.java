@@ -45,7 +45,7 @@ public final class Player {
         return nrGamesWon;
     }
 
-    public void setNrGamesWon(int nrGamesWon) {
+    public void setNrGamesWon(final int nrGamesWon) {
         this.nrGamesWon = nrGamesWon;
     }
 }
