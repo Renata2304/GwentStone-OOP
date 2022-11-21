@@ -279,10 +279,6 @@ public final class CardInput {
         boolean error = SmallFunctions.testErrorUseAbility(objectMapper, output, action,
                 game, table);
 
-        if (error) {
-            return;
-        }
-
         if (!error) {
             switch (cardAttacker.getName()) {
                 case "The Ripper" -> {
@@ -353,20 +349,25 @@ public final class CardInput {
         cardAttacker.setHasAttacked(true);
         // good test
         switch (game.getPlayerTurn()) {
-            case 1 -> {
-                player2.getCardHero().setHealth(player2.getCardHero().getHealth()
-                        - cardAttacker.getAttackDamage());
-                if (player2.getCardHero().getHealth() <= 0) {
-                    OutPrint.playerKilledHero(objectMapper, output, 1);
-                }
-            }
             case 2 -> {
                 player1.getCardHero().setHealth(player1.getCardHero().getHealth()
                         - cardAttacker.getAttackDamage());
                 if (player1.getCardHero().getHealth() <= 0) {
                     OutPrint.playerKilledHero(objectMapper, output, 2);
+                    player2.setNrGamesWon(player2.getNrGamesWon() + 1);
+                    OutPrint.setGamesWon(OutPrint.getGamesWon() + 1);
                 }
             }
+            case 1 -> {
+                player2.getCardHero().setHealth(player2.getCardHero().getHealth()
+                        - cardAttacker.getAttackDamage());
+                if (player2.getCardHero().getHealth() <= 0) {
+                    OutPrint.playerKilledHero(objectMapper, output, 1);
+                    player1.setNrGamesWon(player1.getNrGamesWon() + 1);
+                    OutPrint.setGamesWon(OutPrint.getGamesWon() + 1);
+                }
+            }
+
             default -> {
 
             }

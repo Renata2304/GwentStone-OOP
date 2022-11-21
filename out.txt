@@ -326,8 +326,8 @@
   "output" : 1
 }, {
   "command" : "getPlayerTwoWins",
-  "output" : 1
+  "output" : 0
 }, {
   "command" : "getTotalGamesPlayed",
-  "output" : 2
+  "output" : 1
 } ]

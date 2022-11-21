@@ -7,6 +7,7 @@ public final class Player {
     private ArrayList<CardInput> deck;
     private ArrayList<CardInput> hand;
     private CardInput cardHero;
+    private int nrGamesWon = 0;
 
     public int getMana() {
         return mana;
@@ -38,5 +39,13 @@ public final class Player {
 
     public void setCardHero(final CardInput cardHero) {
         this.cardHero = cardHero;
+    }
+
+    public int getNrGamesWon() {
+        return nrGamesWon;
+    }
+
+    public void setNrGamesWon(int nrGamesWon) {
+        this.nrGamesWon = nrGamesWon;
     }
 }

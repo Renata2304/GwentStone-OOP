@@ -11,6 +11,16 @@ import java.util.ArrayList;
 public final class OutPrint {
     private OutPrint() { }
 
+    private static int gamesWon = 0;
+
+    public static int getGamesWon() {
+        return gamesWon;
+    }
+
+    public static void setGamesWon(int gamesWon) {
+        gamesWon = gamesWon;
+    }
+
     /**
      * i dunno 1
      */

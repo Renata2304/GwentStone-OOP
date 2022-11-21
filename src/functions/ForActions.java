@@ -182,6 +182,22 @@ public final class ForActions {
                         player2.setMana(player2.getMana() - mana);
                     }
                 }
+                case "getPlayerOneWins" -> {
+                    ObjectNode jsonNodes = output.addObject();
+                    jsonNodes.put("command", "getPlayerOneWins");
+                    jsonNodes.put("output", player1.getNrGamesWon());
+                }
+                case "getPlayerTwoWins" -> {
+                    ObjectNode jsonNodes = output.addObject();
+                    jsonNodes.put("command", "getPlayerTwoWins");
+                    jsonNodes.put("output", player2.getNrGamesWon());
+                }
+                case "getTotalGamesPlayed" -> {
+                    ObjectNode jsonNodes = output.addObject();
+                    jsonNodes.put("command", "getTotalGamesPlayed");
+                    jsonNodes.put("output", player1.getNrGamesWon()
+                            + player2.getNrGamesWon());
+                }
                 default -> {
                 }
             }

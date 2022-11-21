@@ -215,12 +215,14 @@ public final class SmallFunctions {
             return true;
         }
         // error 5
-        if (!cardAttacked.isTank(cardAttacked) && CardInput.testIfThereAreTanks(table, game)) {
-            OutPrint.printErrorAbility(objectMapper, output, action, case5);
-            return true;
-        }
-        return false;
+        if (!cardAttacker.getName().equals("Disciple")
+
+                && !cardAttacked.isTank(cardAttacked) && CardInput.testIfThereAreTanks(table, game)) {
+        OutPrint.printErrorAbility(objectMapper, output, action, case5);
+        return true;
     }
+        return false;
+}
 
     /**
      * I use this function to return the front row of each player
@@ -236,7 +238,6 @@ public final class SmallFunctions {
             return 1;
         }
     }
-
     /**
      * I use this function to return the back row of each player
      * playerTurn = 1 -> 3, playerTurn = 2 -> 0

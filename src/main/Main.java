@@ -74,14 +74,14 @@ public final class Main {
         ArrayNode output = objectMapper.createArrayNode();
         //TODO add here the entry point to your implementation
         //GameInput game = inputData.getGames().get(0);
+        Player player1 = new Player();
+        Player player2 = new Player();
         for (GameInput game : inputData.getGames()) {
             int startPlayer = game.getStartGame().getStartingPlayer();
             int shuff = game.getStartGame().getShuffleSeed();
             int idx1 = game.getStartGame().getPlayerOneDeckIdx();
             int idx2 = game.getStartGame().getPlayerTwoDeckIdx();
             int endCont = 0; game.setEndTurn(endCont);
-            Player player1 = new Player();
-            Player player2 = new Player();
             game.setPlayerTurn(startPlayer);
             player1.setMana(1); player2.setMana(1);
             ArrayList<ArrayList<CardInput>> table = new ArrayList<>();
