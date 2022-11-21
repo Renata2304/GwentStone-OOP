@@ -23,6 +23,8 @@
   "output" : 1
 }, {
   "command" : "getCardAtPosition",
+  "x" : 3,
+  "y" : 0,
   "output" : {
     "mana" : 2,
     "attackDamage" : 0,
@@ -56,6 +58,8 @@
   "output" : 1
 }, {
   "command" : "getCardAtPosition",
+  "x" : 3,
+  "y" : 0,
   "output" : {
     "mana" : 2,
     "attackDamage" : 0,

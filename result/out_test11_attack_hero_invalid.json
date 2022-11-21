@@ -1,5 +1,7 @@
 [ {
   "command" : "getCardAtPosition",
+  "x" : 2,
+  "y" : 0,
   "output" : {
     "mana" : 1,
     "attackDamage" : 5,
@@ -23,11 +25,18 @@
   "playerIdx" : 2,
   "output" : {
     "mana" : 3,
-    "health" : 30,
+    "health" : 18,
     "description" : "Standard card: Exact precision is her mantra, emotion is for the weak.",
     "colors" : [ "Black", "Red" ],
     "name" : "Empress Thorina"
   }
+}, {
+  "command" : "useAttackHero",
+  "cardAttacker" : {
+    "x" : 2,
+    "y" : 1
+  },
+  "error" : "Attacker card is frozen."
 }, {
   "command" : "getCardsInHand",
   "playerIdx" : 2,
@@ -48,6 +57,8 @@
   "output" : 2
 }, {
   "command" : "getCardAtPosition",
+  "x" : 0,
+  "y" : 0,
   "output" : {
     "mana" : 1,
     "attackDamage" : 6,
@@ -71,11 +82,25 @@
   "playerIdx" : 2,
   "output" : {
     "mana" : 3,
-    "health" : 30,
+    "health" : 18,
     "description" : "Standard card: Exact precision is her mantra, emotion is for the weak.",
     "colors" : [ "Black", "Red" ],
     "name" : "Empress Thorina"
   }
+}, {
+  "command" : "useAttackHero",
+  "cardAttacker" : {
+    "x" : 1,
+    "y" : 1
+  },
+  "error" : "Attacked card is not of type 'Tank'."
+}, {
+  "command" : "useAttackHero",
+  "cardAttacker" : {
+    "x" : 3,
+    "y" : 1
+  },
+  "error" : "Attacker card has already attacked this turn."
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 2,
@@ -83,7 +108,7 @@
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,
-  "output" : 20
+  "output" : 16
 }, {
   "command" : "getCardsOnTable",
   "output" : [ [ {

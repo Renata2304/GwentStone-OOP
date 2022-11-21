@@ -63,6 +63,11 @@ public final class OutPrint {
         arrayNode.add(arrayNode2);
     }
 
+    public static void printCardOnTable(final ObjectMapper objectMapper, final ArrayNode arrayNode,
+                                        final ArrayList<CardInput> row, final int i) {
+
+    }
+
     /**
      * i dunno 3
      */
@@ -93,15 +98,15 @@ public final class OutPrint {
             final ArrayList<CardInput> cardsHand1, final ArrayList<CardInput> cardsHand2,
             final ArrayList<ArrayList<CardInput>> table, final int playerTurn, final int index,
             final int manamax1, final int manamax2) {
-        final int maxCol = 5, row0 = 0, row1 = 1, row2 = 2, row3 = 3;
+        final int row0 = 0, row1 = 1, row2 = 2, row3 = 3;
         switch (playerTurn) {
             case 1 -> {
                 return SmallFunctions.placeCardOnRow(output, action, cardsHand1, table, index,
-                        manamax1, maxCol, row3, row2);
+                        manamax1, row3, row2);
             }
             case 2 -> {
                 return SmallFunctions.placeCardOnRow(output, action, cardsHand2, table, index,
-                        manamax2, maxCol, row0, row1);
+                        manamax2, row0, row1);
             }
             default -> {
                 return 0;
@@ -111,12 +116,24 @@ public final class OutPrint {
 
     /**
      *
+     * @param output
+     * @param action
+     */
+    public static void errorAddRowFullRow(final ArrayNode output, final ActionsInput action) {
+        ObjectNode jsonNodes = output.addObject();
+        jsonNodes.put("command", action.getCommand());
+        jsonNodes.put("handIdx", action.getHandIdx());
+        jsonNodes.put("error", "Cannot place card on table since row is full.");
+    }
+
+    /**
+     *
      * @param mana
      * @param endCont
      * @return
      */
     public static int incMana(final int mana, final int endCont, final int maxMana) {
-        if (mana != maxMana) {
+        if (endCont / 2 + 1 < maxMana) {
             return endCont / 2 + 1;
         }
         return maxMana;
@@ -275,6 +292,131 @@ public final class OutPrint {
             }
         }
 
+    }
+
+    /**
+     *
+     * @param objectMapper
+     * @param output
+     * @param action
+     * @param table
+     */
+    public static void printFrozenCardsOnTable(final ObjectMapper objectMapper, final ArrayNode
+            output, final ActionsInput action, final ArrayList<ArrayList<CardInput>> table) {
+        final int rowsmax = 4;
+        ObjectNode jsonNodes = output.addObject();
+        jsonNodes.put("command", action.getCommand());
+        ArrayNode arrayNode = jsonNodes.putArray("output");
+        for (int row = 0; row < rowsmax; row++) {
+            for (int poz = 0; poz < table.get(row).size(); poz++) {
+                if (table.get(row).get(poz).isFrozen()) {
+                    OutPrint.printCard(objectMapper, arrayNode, table.get(row), poz);
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param objectMapper
+     * @param output
+     * @param action
+     * @param table
+     */
+    public static void printCardsOnTable(final ObjectMapper objectMapper, final ArrayNode
+            output, final ActionsInput action, final ArrayList<ArrayList<CardInput>> table) {
+        final int rowsmax = 4;
+        ObjectNode jsonNodes = output.addObject();
+        jsonNodes.put("command", action.getCommand());
+        ArrayNode arrayNode1 = jsonNodes.putArray("output");
+        for (int i = 0; i < rowsmax; i++) {
+            ArrayNode arrayNode2 = arrayNode1.addArray();
+            for (int cardId = 0; cardId < table.get(i).size(); cardId++) {
+                OutPrint.printCard(objectMapper, arrayNode2, table.get(i),
+                        cardId);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param objectMapper
+     * @param output
+     * @param action
+     * @param nrCase
+     */
+    public static void printErrorAttackHero(final ObjectMapper objectMapper, final ArrayNode output,
+                                         final ActionsInput action, final int nrCase) {
+        final int case1 = 1, case2 = 2, case3 = 3;
+
+        ObjectNode jsonNodes = output.addObject();
+        jsonNodes.put("command", action.getCommand());
+        ObjectNode jsonNodes2 = objectMapper.createObjectNode();
+        jsonNodes.set("cardAttacker", jsonNodes2);
+        jsonNodes2.put("x", action.getCardAttacker().getX());
+        jsonNodes2.put("y", action.getCardAttacker().getY());
+
+        switch (nrCase) {
+            case case1 -> {
+                jsonNodes.put("error", "Attacker card is frozen.");
+            }
+            case case2 -> {
+                jsonNodes.put("error", "Attacker card has already attacked this turn.");
+            }
+            case case3 -> {
+                jsonNodes.put("error", "Attacked card is not of type 'Tank'.");
+            }
+            default -> {
+            }
+        }
+    }
+
+    /**
+     *
+     * @param objectMapper
+     * @param output
+     * @param playerTurn
+     */
+    public static void playerKilledHero(final ObjectMapper objectMapper, final ArrayNode
+            output, final int playerTurn) {
+        ObjectNode jsonNodes = output.addObject();
+        if (playerTurn == 1) {
+            jsonNodes.put("gameEnded", "Player one killed the enemy hero.");
+        } else {
+            jsonNodes.put("gameEnded", "Player two killed the enemy hero.");
+        }
+    }
+
+    /**
+     *
+     * @param objectMapper
+     * @param output
+     * @param action
+     * @param nrCase
+     */
+    public static void printErrorUseHeroAbility(final ObjectMapper objectMapper,
+                                                final ArrayNode output,
+                                                final ActionsInput action, final int nrCase) {
+        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4;
+
+        ObjectNode jsonNodes = output.addObject();
+        jsonNodes.put("command", action.getCommand());
+        jsonNodes.put("affectedRow", action.getAffectedRow());
+
+        switch (nrCase) {
+            case case1 -> {
+                jsonNodes.put("error", "Not enough mana to use hero's ability.");
+            }
+            case case2 -> {
+                jsonNodes.put("error", "Hero has already attacked this turn.");
+            }
+            case case3 -> {
+                jsonNodes.put("error", "Selected row does not belong to the enemy.");
+            }
+            case case4 -> {
+                jsonNodes.put("error", "Selected row does not belong to the current player.");
+            }
+        }
     }
 
 }

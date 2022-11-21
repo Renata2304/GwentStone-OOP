@@ -50,9 +50,9 @@ public final class ForActions {
                 case "endPlayerTurn" -> {
                     game.setEndTurn(game.getEndTurn() + 1);
                     if (game.getPlayerTurn() == 1) {
-                        SmallFunctions.resetCards(table, 2, 3);
+                        SmallFunctions.resetCards(table, 2, 3, player1);
                     } else {
-                        SmallFunctions.resetCards(table, 1, 0);
+                        SmallFunctions.resetCards(table, 1, 0, player2);
                     }
                     // if they have to both take cards
                     if (game.getEndTurn() % 2 == 0) {
@@ -64,8 +64,8 @@ public final class ForActions {
                         // TODO
                         player1.setMana(player1.getMana()
                                 + OutPrint.incMana(player1.getMana(), game.getEndTurn(), manaMax));
-                        player2.setMana(player2.getMana() + OutPrint.incMana(player2.getMana(),
-                                game.getEndTurn(), manaMax));
+                        player2.setMana(player2.getMana()
+                                + OutPrint.incMana(player2.getMana(), game.getEndTurn(), manaMax));
                     } else {
                      // if they don't have to take cards, we're just going to change player's turn
                         if (game.getPlayerTurn() == 1) {
@@ -99,30 +99,21 @@ public final class ForActions {
                     int mana = OutPrint.addRow(output, action, player1.getHand(), player2.
                             getHand(), table, game.getPlayerTurn(), action.getHandIdx(),
                             player1.getMana(), player2.getMana());
-                    if (mana != 0 && game.getPlayerTurn() == 1) {
+                    if (game.getPlayerTurn() == 1) {
                         player1.setMana(player1.getMana() - mana);
-                    } else if (mana != 0 && game.getPlayerTurn() == 2) {
+                    } else {
                         player2.setMana(player2.getMana() - mana);
                     }
                 }
                 case "getCardsOnTable" -> {
-                    ObjectNode jsonNodes = output.addObject();
-                    jsonNodes.put("command", action.getCommand());
-                    ArrayNode arrayNode1 = jsonNodes.putArray("output");
-                    for (int i = 0; i < rowsmax; i++) {
-                        ArrayNode arrayNode2 = arrayNode1.addArray();
-                        for (int cardId = 0; cardId < table.get(i).size(); cardId++) {
-                            OutPrint.printCard(objectMapper, arrayNode2, table.get(i),
-                                    cardId);
-                        }
-                    }
+                    OutPrint.printCardsOnTable(objectMapper, output, action, table);
                 }
                 case "getEnvironmentCardsInHand" -> {
                     OutPrint.printEnvironmentCard(output, objectMapper, player1.getHand(),
                             player2.getHand(), action);
                 }
                 case "useEnvironmentCard" -> {
-                    int mana;
+                    int mana = 0;
                     if (game.getPlayerTurn() == 1) {
                         mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(),
                                 table, player1, player1.getHand(), player2.getHand());
@@ -130,17 +121,21 @@ public final class ForActions {
                         mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(),
                                 table, player2, player1.getHand(), player2.getHand());
                     }
-                    if (mana != 0) {
-                        if (game.getPlayerTurn() == 1) {
-                            player1.setMana(player1.getMana() - mana);
-                        } else {
-                            player2.setMana(player2.getMana() - mana);
-                        }
+                    if (game.getPlayerTurn() == 1) {
+                        player1.setMana(player1.getMana() - mana);
+                    } else {
+                        player2.setMana(player2.getMana() - mana);
                     }
                 }
                 case "getCardAtPosition" -> {
                     ObjectNode jsonNodes = output.addObject();
                     jsonNodes.put("command", action.getCommand());
+                    jsonNodes.put("x", action.getX());
+                    jsonNodes.put("y", action.getY());
+                    if (action.getY() >= table.get(action.getX()).size()) {
+                        jsonNodes.put("output", "No card available at that position.");
+                        break;
+                    }
                     if (action.getY() < table.get(action.getX()).size()) {
                         ObjectNode jsonNodes2 = objectMapper.createObjectNode();
                         jsonNodes.set("output", jsonNodes2);
@@ -160,22 +155,32 @@ public final class ForActions {
                     }
                 }
                 case "getFrozenCardsOnTable" -> {
-                    ObjectNode jsonNodes = output.addObject();
-                    jsonNodes.put("command", action.getCommand());
-                    ArrayNode arrayNode = jsonNodes.putArray("output");
-                    for (int row = 0; row < rowsmax; row++) {
-                        for (int poz = 0; poz < table.get(row).size(); poz++) {
-                            if (table.get(row).get(poz).isFrozen()) {
-                                OutPrint.printCard(objectMapper, arrayNode, table.get(row), poz);
-                            }
-                        }
-                    }
+                    OutPrint.printFrozenCardsOnTable(objectMapper, output, action, table);
                 }
                 case "cardUsesAttack" -> {
                     CardInput.testCardAttack(output, objectMapper, game, action, table);
                 }
                 case "cardUsesAbility" -> {
-                    CardInput.testUseAbility(output, objectMapper, game, action, table);
+                    if (game.getPlayerTurn() == 1) {
+                        CardInput.testUseAbility(output, objectMapper, game, action, table, player1);
+                    } else {
+                        CardInput.testUseAbility(output, objectMapper, game, action, table, player2);
+                    }
+                    //System.out.println(mana);
+
+                }
+                case "useAttackHero" -> {
+                    CardInput.testAttackHero(output, objectMapper, game, action, table,
+                            player1, player2);
+                }
+                case "useHeroAbility" -> {
+                    int mana = CardInput.testUseHeroAbility(output, objectMapper, game, action, table,
+                            player1, player2);
+                    if (game.getPlayerTurn() == 1) {
+                        player1.setMana(player1.getMana() - mana);
+                    } else {
+                        player2.setMana(player2.getMana() - mana);
+                    }
                 }
                 default -> {
                 }

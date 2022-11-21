@@ -1,4 +1,9 @@
 [ {
+  "command" : "getCardAtPosition",
+  "x" : 0,
+  "y" : 3,
+  "output" : "No card available at that position."
+}, {
   "command" : "cardUsesAttack",
   "cardAttacker" : {
     "x" : 0,
@@ -11,6 +16,8 @@
   "error" : "Attacker card is frozen."
 }, {
   "command" : "getCardAtPosition",
+  "x" : 3,
+  "y" : 0,
   "output" : {
     "mana" : 2,
     "attackDamage" : 0,
@@ -39,6 +46,8 @@
   "output" : 2
 }, {
   "command" : "getCardAtPosition",
+  "x" : 0,
+  "y" : 0,
   "output" : {
     "mana" : 3,
     "attackDamage" : 0,

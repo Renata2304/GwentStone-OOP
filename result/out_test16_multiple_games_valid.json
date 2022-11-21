@@ -18,6 +18,8 @@
   "output" : 1
 }, {
   "command" : "getCardAtPosition",
+  "x" : 0,
+  "y" : 0,
   "output" : {
     "mana" : 2,
     "attackDamage" : 5,
@@ -65,18 +67,22 @@
   "output" : [ ]
 }, {
   "command" : "getCardAtPosition",
+  "x" : 0,
+  "y" : 0,
   "output" : {
     "mana" : 2,
     "attackDamage" : 5,
-    "health" : 1,
+    "health" : 2,
     "description" : "Standard card: A drink can always be served, with the blood of his enemies.",
     "colors" : [ "Red", "Blue", "Pink" ],
     "name" : "Berserker"
   }
 }, {
+  "gameEnded" : "Player two killed the enemy hero."
+}, {
   "command" : "getPlayerMana",
   "playerIdx" : 2,
-  "output" : 4
+  "output" : 2
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,
@@ -86,7 +92,7 @@
   "output" : [ [ {
     "mana" : 2,
     "attackDamage" : 5,
-    "health" : 1,
+    "health" : 2,
     "description" : "Standard card: A drink can always be served, with the blood of his enemies.",
     "colors" : [ "Red", "Blue", "Pink" ],
     "name" : "Berserker"
@@ -161,6 +167,8 @@
   "output" : [ ]
 }, {
   "command" : "getCardAtPosition",
+  "x" : 2,
+  "y" : 0,
   "output" : {
     "mana" : 1,
     "attackDamage" : 7,
@@ -184,6 +192,8 @@
   } ]
 }, {
   "command" : "getCardAtPosition",
+  "x" : 2,
+  "y" : 0,
   "output" : {
     "mana" : 1,
     "attackDamage" : 5,
@@ -204,6 +214,8 @@
   "output" : [ ]
 }, {
   "command" : "getCardAtPosition",
+  "x" : 0,
+  "y" : 0,
   "output" : {
     "mana" : 2,
     "attackDamage" : 0,
@@ -217,6 +229,8 @@
   "output" : [ ]
 }, {
   "command" : "getCardAtPosition",
+  "x" : 2,
+  "y" : 0,
   "output" : {
     "mana" : 1,
     "attackDamage" : 5,
@@ -232,6 +246,8 @@
   "command" : "getPlayerMana",
   "playerIdx" : 1,
   "output" : 4
+}, {
+  "gameEnded" : "Player one killed the enemy hero."
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,
