@@ -25,13 +25,6 @@ public final class OutPrint {
 
     /**
      * Printing every card from a given deck, based on player's turn
-     * @param output
-     * @param objectMapper
-     * @param deck1
-     * @param deck2
-     * @param action
-     * @param nrCards1
-     * @param nrCards2
      */
     public static void printPlayerDeck(final ArrayNode output, final ObjectMapper objectMapper,
                      final ArrayList<CardInput> deck1, final ArrayList<CardInput> deck2,
@@ -62,10 +55,6 @@ public final class OutPrint {
 
     /**
      * Printing one card from a given deck.
-     * @param objectMapper
-     * @param arrayNode
-     * @param deck
-     * @param i
      */
     public static void printCard(final ObjectMapper objectMapper, final ArrayNode arrayNode,
                                  final ArrayList<CardInput> deck, final int i) {
@@ -87,11 +76,7 @@ public final class OutPrint {
     }
 
     /**
-     * Printing one player's hero card.
-     * @param output
-     * @param action
-     * @param objectMapper
-     * @param card
+     * Printing a player's hero card.
      */
     public static void printPlayerHero(final ArrayNode output, final ActionsInput action,
                        final ObjectMapper objectMapper, final CardInput card) {
@@ -113,11 +98,6 @@ public final class OutPrint {
     /**
      * Printing a card from the table that can be found at table[X][Y]. If there is no card at that
      * position, an error will be printed.
-     * @param objectMapper
-     * @param output
-     * @param game
-     * @param action
-     * @param table
      */
     public static void printGetCardAtPosition(final ObjectMapper objectMapper,
                                               final ArrayNode output, final GameInput game,
@@ -152,12 +132,10 @@ public final class OutPrint {
 
 
     /**
-     *
-     * @param card
-     * @param manaHand
-     * @return
+     * Prints the errors that may occur when trying to place a card on the table.
+     * @return true (there was an error) / false (otherwise)
      */
-    public static boolean printErrorCardPlaceCard(final ArrayNode output,
+    public static boolean printErrorPlaceCard(final ArrayNode output,
                                                   final ActionsInput action,
                                                   final CardInput card, final int manaHand) {
         if (Objects.equals(card.getType(card), "Environment")) {
@@ -166,7 +144,7 @@ public final class OutPrint {
             jsonNodes.put("handIdx", action.getHandIdx());
             jsonNodes.put("error",
                     "Cannot place environment card on table.");
-            return false;
+            return true;
         }
         if (card.getMana() > manaHand) {
             ObjectNode jsonNodes = output.addObject();
@@ -174,14 +152,12 @@ public final class OutPrint {
             jsonNodes.put("handIdx", action.getHandIdx());
             jsonNodes.put("error",
                     "Not enough mana to place card on table.");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
     /**
-     *
-     * @param output
-     * @param action
+     * Prints the error found when a player is trying to add a card on an already full row.
      */
     public static void errorAddRowFullRow(final ArrayNode output, final ActionsInput action) {
         ObjectNode jsonNodes = output.addObject();
@@ -191,25 +167,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param mana
-     * @param endCont
-     * @return
-     */
-    public static int incMana(final int mana, final int endCont, final int maxMana) {
-        if (endCont / 2 + 1 < maxMana) {
-            return endCont / 2 + 1;
-        }
-        return maxMana;
-    }
-
-    /**
-     *
-     * @param output
-     * @param objectMapper
-     * @param deck1
-     * @param deck2
-     * @param action
+     * Prints an environment card from one player's deck.
      */
     public static void printEnvironmentCard(final ArrayNode output, final ObjectMapper objectMapper,
                            final ArrayList<CardInput> deck1, final ArrayList<CardInput> deck2,
@@ -243,10 +201,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param output
-     * @param action
-     * @param nrCase
+     * Prints the errors that may occur when a player is trying to use an environment card.
      */
     public static void printErrorEnvironment(final ArrayNode output, final ActionsInput action,
                                              final int nrCase) {
@@ -277,11 +232,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param objectMapper
-     * @param output
-     * @param action
-     * @param nrCase
+     * Prints the errors that my occur when a player is trying to attack the opponent's cards.
      */
     public static void printErrorAttack(final ObjectMapper objectMapper, final ArrayNode output,
                                         final ActionsInput action, final int nrCase) {
@@ -316,10 +267,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param output
-     * @param action
-     * @param nrCase
+     * Prints the errors that may occur when a player is trying to use a card's ability.
      */
     public static void printErrorAbility(final ObjectMapper objectMapper, final ArrayNode output,
                                          final ActionsInput action, final int nrCase) {
@@ -359,11 +307,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param objectMapper
-     * @param output
-     * @param action
-     * @param table
+     * Prints the frozen cards on the table.
      */
     public static void printFrozenCardsOnTable(final ObjectMapper objectMapper, final ArrayNode
             output, final ActionsInput action, final ArrayList<ArrayList<CardInput>> table) {
@@ -381,11 +325,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param objectMapper
-     * @param output
-     * @param action
-     * @param table
+     * Prints all the cards on the table.
      */
     public static void printCardsOnTable(final ObjectMapper objectMapper, final ArrayNode
             output, final ActionsInput action, final ArrayList<ArrayList<CardInput>> table) {
@@ -403,11 +343,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param objectMapper
-     * @param output
-     * @param action
-     * @param nrCase
+     * Prints the errors that may occur when a player is trying to attack the opponent's hero.
      */
     public static void printErrorAttackHero(final ObjectMapper objectMapper, final ArrayNode output,
                                          final ActionsInput action, final int nrCase) {
@@ -436,10 +372,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param objectMapper
-     * @param output
-     * @param playerTurn
+     * Prints the message that one of the players killed the other's hero.
      */
     public static void playerKilledHero(final ObjectMapper objectMapper, final ArrayNode
             output, final int playerTurn) {
@@ -452,11 +385,7 @@ public final class OutPrint {
     }
 
     /**
-     *
-     * @param objectMapper
-     * @param output
-     * @param action
-     * @param nrCase
+     * Prints the errors that may occur when a player is trying to use a hero's ability.
      */
     public static void printErrorUseHeroAbility(final ObjectMapper objectMapper,
                                                 final ArrayNode output,

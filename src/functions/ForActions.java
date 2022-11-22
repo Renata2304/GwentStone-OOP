@@ -88,10 +88,10 @@ public final class ForActions {
             case "cardUsesAbility" -> {
                 if (game.getPlayerTurn() == 1) {
                     CardInput.testUseAbility(output, objectMapper, game, action,
-                            table, player1);
+                            table);
                 } else {
                     CardInput.testUseAbility(output, objectMapper, game, action,
-                            table, player2);
+                            table);
                 }
             }
             case "useAttackHero" -> {
@@ -123,6 +123,17 @@ public final class ForActions {
     }
 
     /**
+     * Increases the mana of a player, at the end of a round.
+     * @return the value of mana that needs to be added to the player's mana.
+     */
+    public static int incMana(final int mana, final int endCont, final int maxMana) {
+        if (endCont / 2 + 1 < maxMana) {
+            return endCont / 2 + 1;
+        }
+        return maxMana;
+    }
+
+    /**
      * Function for the case endPlayerTurn that resets cards frozen and hasAttacked status after
      * each turn, based on the player's turn. After each round (two turns) I also increase the mana
      * of each player. Each time, I change the playerTurn.
@@ -148,9 +159,9 @@ public final class ForActions {
             game.setPlayerTurn(startPlayer);
             // adding to each player's mana
             player1.setMana(player1.getMana()
-                    + OutPrint.incMana(player1.getMana(), game.getEndTurn(), manaMax));
+                    + incMana(player1.getMana(), game.getEndTurn(), manaMax));
             player2.setMana(player2.getMana()
-                    + OutPrint.incMana(player2.getMana(), game.getEndTurn(), manaMax));
+                    + incMana(player2.getMana(), game.getEndTurn(), manaMax));
         } else {
             // if they don't have to take cards, we're just going to change player's turn
             if (game.getPlayerTurn() == 1) {
@@ -216,13 +227,13 @@ public final class ForActions {
                                               final ActionsInput action, final Player player1,
                                               final Player player2,
                                               final ArrayList<ArrayList<CardInput>> table) {
-        int mana = 0;
+        int mana;
         if (game.getPlayerTurn() == 1) {
-            mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(),
-                    table, player1, player1.getHand(), player2.getHand());
+            mana = CardInput.testCardEnvironment(output, game, action, table, player1,
+                    player1.getHand());
         } else {
-            mana = CardInput.testCardEnvironment(output, action, game.getPlayerTurn(),
-                    table, player2, player1.getHand(), player2.getHand());
+            mana = CardInput.testCardEnvironment(output, game, action, table, player2,
+                    player2.getHand());
         }
         if (game.getPlayerTurn() == 1) {
             player1.setMana(player1.getMana() - mana);

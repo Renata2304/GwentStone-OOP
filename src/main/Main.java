@@ -79,9 +79,9 @@ public final class Main {
                 Input.class);
         ArrayNode output = objectMapper.createArrayNode();
         //TODO add here the entry point to your implementation
-        //GameInput game = inputData.getGames().get(0);
         Player player1 = new Player();
         Player player2 = new Player();
+
         for (GameInput game : inputData.getGames()) {
             int startPlayer = game.getStartGame().getStartingPlayer();
             int shuff = game.getStartGame().getShuffleSeed();
@@ -108,16 +108,17 @@ public final class Main {
             player1.setCardHero(game.getStartGame().getPlayerOneHero());
             player2.setCardHero(game.getStartGame().getPlayerTwoHero());
             // setting health for each player's hero
-            final int nr = 30; player1.getCardHero().setHealth(nr); player2.getCardHero().
-                    setHealth(nr);
+            final int nr = 30;
+            // setting the health of each player's hero
+            player1.getCardHero().setHealth(nr); player2.getCardHero().setHealth(nr);
             player1.setHand(new ArrayList<>()); player2.setHand(new ArrayList<>());
             // taking the first card
-            CardInput copy1 = new CardInput(); copy1 = copy1.copyOneCard(player1.getDeck(), 0);
+            CardInput copy1 = CardInput.copyOneCard(player1.getDeck(), 0);
             player1.getHand().add(copy1);
             // removing the card taken from the deck
             player1.getDeck().remove(0);
             // taking the first card
-            CardInput copy2 = new CardInput(); copy2 = copy2.copyOneCard(player2.getDeck(), 0);
+            CardInput copy2 = CardInput.copyOneCard(player2.getDeck(), 0);
             player2.getHand().add(copy2);
             // removing the card taken from the deck
             player2.getDeck().remove(0);

@@ -1,0 +1,36 @@
+Vaideanu Renata - Georgia - 322 CD ACS
+
+In the main/Main.java file can be found the action method. Inside of it I added a loop that goes
+trough each game. At the beginning of the game, I start implementing all the parameters, for
+example: reset the mana of each player, recopy and reshuffle the decks of each player. During every
+game, I use a loop for all the actions that may occur during a game.
+
+I added the package functions, so that the code could be accessed more easily, not wanting to have
+every method in a single class.
+- The class ForActions is used for testing every action that can be found during a game. For the
+  cases endPLayerTurn, placeCard, useEnvironmentCard, useHeroAbility I implemented a method so
+  that the method forAc could be easier to read.
+- The class OutPrint is used to print errors for the cases: useEnvironmentCard, cardUsesAttack,
+  cardUsesAbility, useAttackHero and useHeroAbility, placeCards (when the row is full).
+  It is also used for printing the cards in a given deck, printing a specific deck, printing a
+  player's hero card, or printing the Environment or Frozen cards on the table. In case a hero
+  is killed it will also print the message: Player one/two killed the enemy hero.
+- The class SmallFunctions is mostly used for the duplicated code: resetCards (for reseting the
+  hasAttacked and frozen status of a player's cards at the end of the round), takeCard (taking
+  cards from a deck), placeCardOnRow (placing cards on a player's back/front row). It also
+  implements boolean methods that test if there are any errors in the cases: useEnvironmentCard,
+  cardUsesAttack, cardUsesAbility, useAttackHero and useHeroAbility. These methods return true
+  if an error occurred or true otherwise.
+
+I also added in the package fileio the Player class that implements the characteristics of each
+player: total mana, their deck, their cards in hand, their hero card and the number of games that
+they won.
+
+I also changed the fileio.CardInput.java class, by adding the boolean frozen and hasAttacked status
+(true if the card is frozen/has attacked and false otherwise). The methods I implemented in
+CardInput are: getType (minion or environment), copyOneCard (copies one card from a deck and
+returns the deep copied version of it), getPosition (front or back - rows on the table), the ones
+that test the cards in the cases: useEnvironmentCard (that is followed by 3 other methods, based on
+the type of environment card), cardUsesAttack, cardUsesAbility, useAttackHero and useHeroAbility.
+There also is a testIfThereAreTanks, used for testing to see if the other player has tanks on
+their rows.

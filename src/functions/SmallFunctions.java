@@ -68,7 +68,7 @@ public final class SmallFunctions {
         final int maxCol = 5;
         CardInput card = CardInput.copyOneCard(cardsHand, index);
         // first two errors
-        if (!OutPrint.printErrorCardPlaceCard(output, action, card, manamax)) {
+        if (OutPrint.printErrorPlaceCard(output, action, card, manamax)) {
             return 0;
         }
         if (card.getPosition(card) == 1) { // front
@@ -91,72 +91,99 @@ public final class SmallFunctions {
     }
 
     /**
-     * Recieves as parameter cardenv, the environment card that needs to be tested.
-     * Get mana from different Environment card types: heartHound, firestorm, winterfell.
-     * Each of the three types uses a specific method.
-     * @return mana from specific environment card type
-     */
-    public static int useEnvironmentType(final ArrayNode output, final ActionsInput action,
-                                         final ArrayList<ArrayList<CardInput>> table,
-                                         final ArrayList<CardInput> cardsHand1,
-                                         final CardInput cardenv) {
-        int mana = cardenv.getMana();
-        // Heart Hound case
-        if (Objects.equals(cardenv.getName(), "Heart Hound")) {
-            if (CardInput.heartHound(output, action, table)) {
-                cardsHand1.remove(cardenv);
-                return mana;
-            } else {
-                return 0;
-            }
-        }
-        // Firestorm case
-        if (Objects.equals(cardenv.getName(), "Firestorm")) {
-            CardInput.firestorm(action, table);
-            cardsHand1.remove(cardenv);
-            return mana;
-        }
-        // Winterfell case
-        if (Objects.equals(cardenv.getName(), "Winterfell")) {
-            CardInput.winterfell(action, table);
-            cardsHand1.remove(cardenv);
-            return mana;
-        }
-        return 0;
-    }
-
-    /**
      * Function designed for testing the possible errors that prevents the player from using
      * an environment card (if there are errors, they will be printed using the
      * printErrorEnvironment method). If there are no errors, the method will return the mana
      * of the environment card.
      * @return mana of the environment card (or 0 if there are errors)
      */
-    public static int testErrorEnvironment(final ArrayNode output, final ActionsInput action,
+    public static boolean testErrorEnvironment(final ArrayNode output, final GameInput game,
+                                           final ActionsInput action,
                                   final ArrayList<ArrayList<CardInput>> table, final Player player,
-                                  final int rowFront, final int rowBack, final ArrayList<CardInput>
-                                  cardsHand) {
-        final int case1 = 1, case2 = 2, case3 = 3, maxrows = 3;
-        CardInput cardenv = cardsHand.get(action.getHandIdx());
+                                  final CardInput cardenv) {
+        final int case1 = 1, case2 = 2, case3 = 3, maxrows = 3,
+                  row0 = 0, row1 = 1, row2 = 2, row3 = 3;
+        int rowFront, rowBack;
+
+        if (game.getPlayerTurn() == 1) {
+            rowFront = row2; rowBack = row3;
+        } else {
+            rowFront = row1; rowBack = row0;
+        }
+        // error 1
         if (!Objects.equals(cardenv.getType(cardenv), "Environment")) {
             OutPrint.printErrorEnvironment(output, action, case1);
-            return 0;
+            return true;
         }
+        // error 2
         if (cardenv.getMana() > player.getMana()) {
             OutPrint.printErrorEnvironment(output, action, case2);
-            return 0;
+            return true;
         }
-        if (action.getAffectedRow() == maxrows - rowFront
-                || action.getAffectedRow() == maxrows - rowBack) {
+        // error 3
+        if (action.getAffectedRow() == rowFront
+                || action.getAffectedRow() == rowBack) {
             OutPrint.printErrorEnvironment(output, action, case3);
-            return 0;
+            return true;
         }
-        return SmallFunctions.useEnvironmentType(output, action, table, cardsHand, cardenv);
+        // error 4
+        if (Objects.equals(cardenv.getName(), "Heart Hound")
+                && !CardInput.heartHound(output, action, table)) {
+            return true;
+        }
+        return false; // no errors = good case
     }
 
     /**
-     * Function used for testing the erros that can prevent a player from using an
-     * @return
+     * Function used to test if there are errors that can prevent the player from attacking another
+     * player's card. If there are errors they will be printed using printErrorAttack.
+     * @return true (there are errors) / false (there are no errors)
+     */
+    public static boolean testErrorCardAttack(final ObjectMapper objectMapper,
+                                  final ArrayNode output, final ArrayList<ArrayList<CardInput>>
+                                  table, final ActionsInput action, final GameInput game,
+                                  final CardInput cardAttacker, final CardInput cardAttacked) {
+        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4,
+                  row0 = 0, row1 = 1, row2 = 2, row3 = 3;
+        int rowFront, rowBack;
+
+        if (game.getPlayerTurn() == 1) {
+            rowFront = row2; rowBack = row3;
+        } else {
+            rowFront = row1; rowBack = row0;
+        }
+
+        // error 1
+        if (action.getCardAttacked().getX() == rowFront
+                || action.getCardAttacked().getX() == rowBack) {
+            OutPrint.printErrorAttack(objectMapper, output, action, case1);
+            return true;
+        }
+        // error 2
+        if (cardAttacker.isHasAttacked()) {
+            OutPrint.printErrorAttack(objectMapper, output, action, case2);
+            return true;
+        }
+        // error 3
+        if (cardAttacker.isFrozen()) {
+            OutPrint.printErrorAttack(objectMapper, output, action, case3);
+            return true;
+        }
+        // error 4
+        if (!cardAttacked.isTank(cardAttacked)
+                && CardInput.testIfThereAreTanks(table, game)) {
+            OutPrint.printErrorAttack(objectMapper, output, action, case4);
+            return true;
+        }
+        // good test
+        return false;
+    }
+
+    /**
+     * Function used for testing the possible erros that can prevent a player from using a card's
+     * ability. If there are errors they will be printed using printErrorAbility. Otherwise, the
+     * function will return false, meaning there were no errors.
+     * @return true (if there were errors), false (if there weren't any errors)
      */
     public static boolean testErrorUseAbility(final ObjectMapper objectMapper,
                                               final ArrayNode output, final ActionsInput action,
@@ -211,5 +238,74 @@ public final class SmallFunctions {
     }
         return false;
 }
+
+    /**
+     * Function used for testing the possible erros that can prevent a player from attacking the
+     * opponent's hero. If there are errors they will be printed using printErrorAttackHero.
+     * Otherwise, the function will return false, meaning there were no errors.
+     * @return true (if there were errors), false (if there weren't any errors)
+     */
+    public static boolean testErrorAttackHero(final ObjectMapper objectMapper,
+                                              final ArrayNode output, final GameInput game,
+                                              final ActionsInput action,
+                                              final ArrayList<ArrayList<CardInput>> table,
+                                              final CardInput cardAttacker) {
+        final int case1 = 1, case2 = 2, case3 = 3;
+        // error 1
+        if (cardAttacker.isFrozen()) {
+            OutPrint.printErrorAttackHero(objectMapper, output, action, case1);
+            return true;
+        }
+        // error 2
+        if (cardAttacker.isHasAttacked()) {
+            OutPrint.printErrorAttackHero(objectMapper, output, action, case2);
+            return true;
+        }
+        // error 3
+        if (CardInput.testIfThereAreTanks(table, game)) {
+            OutPrint.printErrorAttackHero(objectMapper, output, action, case3);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Function used for testing the possible erros that can prevent a player from using their
+     * hero's ability. If there are errors they will be printed using printErrorUseHeroAbility.
+     * Otherwise, the function will return false, meaning there were no errors.
+     * @return true (if there were errors), false (if there weren't any errors)
+     */
+    public static boolean testErrorUseHeroAbility(final ObjectMapper objectMapper,
+                                                  final ArrayNode output,
+                                                  final ActionsInput action, final Player player,
+                                                  final CardInput hero,
+                                                  final int rowFront, final int rowBack) {
+        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4, maxRow = 3;
+        // error 1
+        if (player.getMana() < player.getCardHero().getMana()) {
+            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case1);
+            return true;
+        }
+        // error 2
+        if (hero.isHasAttacked()) {
+            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case2);
+            return true;
+        }
+        // error 3
+        if ((hero.getName().equals("Lord Royce") || hero.getName().equals("Empress Thorina"))
+                && (action.getAffectedRow() == rowFront
+                || action.getAffectedRow() == rowBack)) {
+            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case3);
+            return true;
+        }
+        // error 4
+        if ((hero.getName().equals("General Kocioraw") || hero.getName().equals("King Mudface"))
+                && (action.getAffectedRow() == maxRow - rowFront
+                || action.getAffectedRow() == maxRow - rowBack)) {
+            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case4);
+            return true;
+        }
+        return false;
+    }
 
 }

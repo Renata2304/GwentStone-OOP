@@ -87,11 +87,10 @@ public final class CardInput {
     }
 
     /**
-     *
-     * @param card
-     * @return
+     * Function that tests if a card is Tank, based on its name.
+     * @return true (the card is a Tank) / false (otherwise)
      */
-    public boolean isTank(final CardInput card) {
+    public static boolean isTank(final CardInput card) {
         if (Objects.equals(card.getName(), "Goliath")) {
             return true;
         }
@@ -102,9 +101,9 @@ public final class CardInput {
     }
 
     /**
-     *
-     * @param card
-     * @return
+     * Function that returns the type of card (given as a parameter).
+     * @return Minion (if the card is a minion) / Environment (if the card is an environment card)
+     * / "No type" (if it is an error)
      */
     public String getType(final CardInput card) {
         if (Objects.equals(card.name, "Sentinel") || Objects.equals(card.name, "Berserker")
@@ -121,136 +120,191 @@ public final class CardInput {
     }
 
     /**
-     *
-     * @param output
-     * @param action
-     * @param playerTurn
-     * @param table
-     * @param cardsHand1
-     * @param cardsHand2
-     * @return
+     * Function used for deep copying one card found in given deck at position i.
      */
-    public static int testCardEnvironment(final ArrayNode output, final ActionsInput action,
-                        final int playerTurn, final ArrayList<ArrayList<CardInput>> table,
-                        final Player player, final ArrayList<CardInput> cardsHand1,
-                        final ArrayList<CardInput> cardsHand2) {
-        switch (playerTurn) {
-            case 1 -> {
-                return SmallFunctions.testErrorEnvironment(output, action, table, player,
-                        ROW1, ROW0, cardsHand1);
+    public static CardInput copyOneCard(final ArrayList<CardInput> deck, final int i) {
+        CardInput card = new CardInput();
+        card.setMana(deck.get(i).getMana());
+        card.setAttackDamage(deck.get(i).getAttackDamage());
+        card.setHealth(deck.get(i).getHealth());
+        card.setDescription(deck.get(i).getDescription());
+        card.setColors(deck.get(i).getColors());
+        card.setName(deck.get(i).getName());
+
+        return card;
+    }
+
+    /**
+     * Function used to get the row (front/back) on which a card should pe placed.
+     * @return front (1) / back (2) / error (0)
+     */
+    public int getPosition(final CardInput card) {
+        if (Objects.equals(card.name, "The Ripper")
+                || Objects.equals(card.name, "Miraj")
+                || Objects.equals(card.name, "Goliath")
+                || Objects.equals(card.name, "Warden")) {
+            return 1; // front
+        } else if (Objects.equals(card.name, "Sentinel")
+                || Objects.equals(card.name, "Disciple")
+                || Objects.equals(card.name, "The Cursed One")
+                || Objects.equals(card.name, "Berserker")) {
+            return 2; // back
+        }
+        return 0;
+    }
+
+    /**
+     * Function used for useEnvironmentCard case. At first, it tests if there are any errors that
+     * can prevent the player from attacking a card (using testErrorEnvironment). If there are
+     * no errors, there will be 3 cases, based on the 3 types of environment cards.
+     * In the end, I erase the environment from the player's hand.
+     * @return mana of the environment card used, so that it could be decreased from the player's
+     * total mana.
+     */
+    public static int testCardEnvironment(final ArrayNode output, final GameInput game,
+                                          final ActionsInput action,
+                                          final ArrayList<ArrayList<CardInput>> table,
+                                          final Player player,
+                                          final ArrayList<CardInput> cardsHand) {
+        CardInput cardenv = cardsHand.get(action.getHandIdx());
+
+        // testing to see if there are any errors
+        boolean error = SmallFunctions.testErrorEnvironment(output, game, action, table, player,
+                cardenv);
+
+        // if there are no errors
+        if (!error) {
+            int mana = cardenv.getMana();
+            // Heart Hound case
+            // I don't test the error because I already tested it in testErrorEnvironment (case 4)
+            if (Objects.equals(cardenv.getName(), "Heart Hound")) {
+                cardsHand.remove(cardenv);
+                return mana;
             }
-            case 2 -> {
-                return SmallFunctions.testErrorEnvironment(output, action, table, player,
-                        ROW2, ROW3, cardsHand2);
+            // Firestorm case
+            if (Objects.equals(cardenv.getName(), "Firestorm")) {
+                CardInput.firestorm(action, table);
+                cardsHand.remove(cardenv);
+                return mana;
             }
-            default -> {
-                return 0;
+            // Winterfell case
+            if (Objects.equals(cardenv.getName(), "Winterfell")) {
+                CardInput.winterfell(action, table);
+                cardsHand.remove(cardenv);
+                return mana;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Treating the Firestorm card case. If the environment card used by the player is
+     * Firestorm, I decrease all the card's health. If their health is <= 0, they will be
+     * erased from the table.
+     */
+    public static void firestorm(final ActionsInput action,
+                                 final ArrayList<ArrayList<CardInput>> table) {
+        for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
+            table.get(action.getAffectedRow()).get(i).setHealth(table.
+                    get(action.getAffectedRow()).get(i).getHealth() - 1);
+            if (table.get(action.getAffectedRow()).get(i).getHealth() == 0) {
+                table.get(action.getAffectedRow()).remove(i);
+                i--;
             }
         }
     }
 
     /**
-     *
-     * @param output
-     * @param objectMapper
-     * @param game
-     * @param action
-     * @param table
+     * Treating the Winterfell card case. If the environment card used by the player is
+     * Winterfell, all the cards from a specific row will be frozen.
+     */
+    public static void winterfell(final ActionsInput action,
+                                  final ArrayList<ArrayList<CardInput>> table) {
+        for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
+            table.get(action.getAffectedRow()).get(i).setFrozen(true);
+        }
+    }
+
+    /**
+     * Treating the Heart Hound card case. If the environment card used by the player is
+     * Heart Hound, the player will steal the opponent's card that has the most health and
+     * place it on their row.
+     * @return true (if the action is completed succesfully) / false (if there is no more
+     * space on the player's row.
+     */
+    public static boolean heartHound(final ArrayNode output, final ActionsInput action,
+                                     final ArrayList<ArrayList<CardInput>> table) {
+        final int maxRow = 4, maxCol = 5, case4 = 4;
+        int currRow = maxRow - action.getAffectedRow();
+        if (table.get(currRow).size() < maxCol) {
+            CardInput cardStolen = table.get(action.getAffectedRow()).get(0);
+            for (int i = 1; i < table.get(action.getAffectedRow()).size(); i++) {
+                if (cardStolen.health < table.get(action.getAffectedRow()).get(i).health) {
+                    cardStolen = table.get(action.getAffectedRow()).get(i);
+                }
+            }
+            table.get(action.getAffectedRow()).remove(cardStolen);
+            table.get(currRow).add(cardStolen);
+            return true;
+        } else {
+            OutPrint.printErrorEnvironment(output, action, case4);
+            return false;
+        }
+    }
+
+    /**
+     * Function used for the cardUsesAttack case. At first, it tests if there are any errors that
+     * can prevent the player from attacking a card (using testErrorCardAttack). If there are
+     * no errors, I decrease the health of the attacked card and if the card has health <= 0,
+     * I erase it from the table. In the end, I set the hasAttacked status of the player's
+     * card to true so that it won't attack twice during the same round.
      */
     public static void testCardAttack(final ArrayNode output, final ObjectMapper objectMapper,
-            final GameInput game, final ActionsInput action, final ArrayList<ArrayList<CardInput>>
-            table) {
-        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4;
+                                      final GameInput game, final ActionsInput action,
+                                      final ArrayList<ArrayList<CardInput>> table) {
         CardInput cardAttacker = table.get(action.getCardAttacker().getX()).
                 get(action.getCardAttacker().getY());
         CardInput cardAttacked = table.get(action.getCardAttacked().getX()).
                 get(action.getCardAttacked().getY());
+
         final int xAttacked = action.getCardAttacked().getX(),
                   yAttacked = action.getCardAttacked().getY();
-        if (game.getPlayerTurn() == 1) {
-            // error 1
-            if (xAttacked == ROW2 || xAttacked == ROW3) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case1);
-                return;
-            }
-            // error 2
-            if (cardAttacker.isHasAttacked()) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case2);
-                return;
-            }
-            // error 3
-            if (cardAttacker.isFrozen()) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case3);
-                return;
-            }
-            // error 4
-            if (!cardAttacked.isTank(cardAttacked)
-                    && testIfThereAreTanks(table, game)) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case4);
-                return;
-            }
-            // good test
+
+        // testing to see if there are any errors
+        boolean error = SmallFunctions.testErrorCardAttack(objectMapper, output, table, action,
+                                                    game, cardAttacker, cardAttacked);
+        // if there are no errors
+        if (!error) {
             cardAttacked.setHealth(cardAttacked.getHealth() - cardAttacker.getAttackDamage());
             if (cardAttacked.getHealth() <= 0) {
                 table.get(xAttacked).remove(yAttacked);
             }
             cardAttacker.setHasAttacked(true);
-            return;
-        } else {
-            // error 1
-            if (xAttacked == ROW0 || xAttacked == ROW1) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case1);
-                return;
-            }
-            // error 2
-            if (cardAttacker.isHasAttacked()) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case2);
-                return;
-            }
-            // error 3
-            if (cardAttacker.isFrozen()) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case3);
-                return;
-            }
-            // error 4
-            if (!cardAttacked.isTank(cardAttacked)
-                    && testIfThereAreTanks(table, game)) {
-                OutPrint.printErrorAttack(objectMapper, output, action, case4);
-                return;
-            }
-            // good test
-            cardAttacked.setHealth(cardAttacked.getHealth() - cardAttacker.getAttackDamage());
-            if (cardAttacked.getHealth() <= 0) {
-                table.get(xAttacked).remove(yAttacked);
-            }
-            cardAttacker.setHasAttacked(true);
-            return;
         }
     }
 
     /**
-     *
-     * @param output
-     * @param objectMapper
-     * @param game
-     * @param action
-     * @param table
+     * Function used for the cardUsesAbility case. At first, it tests if there are any errors that
+     * can prevent the player from using a card's ability (using testErrorUseAbility). If there are
+     * no errors, based on each card's ability, the player can use their card's ability. In the
+     * end, the attacker's card attack status will be set to true so that it won't attack
+     * twice during the same round. If the opponent's damage lvl will go under 0, it will be
+     * set to 0. If the opponent's card's life will ge under 0, it will be erased from the table.
      */
     public static void testUseAbility(final ArrayNode output, final ObjectMapper objectMapper,
-            final GameInput game, final ActionsInput action, final ArrayList<ArrayList<CardInput>>
-            table, final Player player) {
+                                      final GameInput game, final ActionsInput action,
+                                      final ArrayList<ArrayList<CardInput>> table) {
+
         CardInput cardAttacker = table.get(action.getCardAttacker().getX()).
                 get(action.getCardAttacker().getY());
         CardInput cardAttacked = table.get(action.getCardAttacked().getX()).
                 get(action.getCardAttacked().getY());
 
-        if (!testIfSpecialCard(cardAttacker)) {
-            return;
-        }
-
+        // testing to see if there are any errors
         boolean error = SmallFunctions.testErrorUseAbility(objectMapper, output, action,
                 game, table);
 
+        // if there are no errors
         if (!error) {
             switch (cardAttacker.getName()) {
                 case "The Ripper" -> {
@@ -279,314 +333,157 @@ public final class CardInput {
             if (cardAttacked.getAttackDamage() < 0) {
                 cardAttacked.setAttackDamage(0);
             }
-            /*
-            player.setMana(player.getMana() -  table.get(action.getCardAttacker().getX()).
-                    get(action.getCardAttacker().getY()).getMana());
-             */
         }
     }
 
     /**
-     *
-     * @param output
-     * @param objectMapper
-     * @param game
-     * @param action
-     * @param table
-     * @param player1
-     * @param player2
+     * Function used for the useAttackHero case. At first, it tests if there are any errors that
+     * can prevent the player from attacking the opponent's hero (using testErrorAttackHero).
+     * If there are no errors, based on the current player's turn, the active player will
+     * attack the opponent's hero, decreasing its life, by the value of the player's card's
+     * attack. If the life of the opponent's hero goes under 0, the game ends and the player's
+     * amount of games won will be increased. The amount of games played will be increased
+     * regardless of the player's turn.
      */
     public static void testAttackHero(final ArrayNode output, final ObjectMapper objectMapper,
             final GameInput game, final ActionsInput action, final ArrayList<ArrayList<CardInput>>
             table, final Player player1, final Player player2) {
-        final int case1 = 1, case2 = 2, case3 = 3;
 
         CardInput cardAttacker = table.get(action.getCardAttacker().getX()).
                 get(action.getCardAttacker().getY());
-        // error 1
-        if (cardAttacker.isFrozen()) {
-            OutPrint.printErrorAttackHero(objectMapper, output, action, case1);
-            return;
-        }
-        // error 2
-        if (cardAttacker.isHasAttacked()) {
-            OutPrint.printErrorAttackHero(objectMapper, output, action, case2);
-            return;
-        }
-        // error 3
-        if (CardInput.testIfThereAreTanks(table, game)) {
-            OutPrint.printErrorAttackHero(objectMapper, output, action, case3);
-            return;
-        }
-        cardAttacker.setHasAttacked(true);
-        // good test
-        switch (game.getPlayerTurn()) {
-            case 2 -> {
-                player1.getCardHero().setHealth(player1.getCardHero().getHealth()
-                        - cardAttacker.getAttackDamage());
-                if (player1.getCardHero().getHealth() <= 0) {
-                    OutPrint.playerKilledHero(objectMapper, output, 2);
-                    player2.setNrGamesWon(player2.getNrGamesWon() + 1);
-                    OutPrint.setGamesWon(OutPrint.getGamesWon() + 1);
-                }
-            }
-            case 1 -> {
-                player2.getCardHero().setHealth(player2.getCardHero().getHealth()
-                        - cardAttacker.getAttackDamage());
-                if (player2.getCardHero().getHealth() <= 0) {
-                    OutPrint.playerKilledHero(objectMapper, output, 1);
-                    player1.setNrGamesWon(player1.getNrGamesWon() + 1);
-                    OutPrint.setGamesWon(OutPrint.getGamesWon() + 1);
-                }
-            }
 
-            default -> {
+        // testing to see if there are any errors
+        boolean error = SmallFunctions.testErrorAttackHero(objectMapper, output, game, action,
+                                                           table, cardAttacker);
 
+        // if there are no errors
+        if (!error) {
+            cardAttacker.setHasAttacked(true);
+            // good test
+            switch (game.getPlayerTurn()) {
+                case 1 -> {
+                    player2.getCardHero().setHealth(player2.getCardHero().getHealth()
+                            - cardAttacker.getAttackDamage());
+                    if (player2.getCardHero().getHealth() <= 0) {
+                        OutPrint.playerKilledHero(objectMapper, output, 1);
+                        player1.setNrGamesWon(player1.getNrGamesWon() + 1);
+                        OutPrint.setGamesWon(OutPrint.getGamesWon() + 1);
+                    }
+                }
+                case 2 -> {
+                    player1.getCardHero().setHealth(player1.getCardHero().getHealth()
+                            - cardAttacker.getAttackDamage());
+                    if (player1.getCardHero().getHealth() <= 0) {
+                        OutPrint.playerKilledHero(objectMapper, output, 2);
+                        player2.setNrGamesWon(player2.getNrGamesWon() + 1);
+                        OutPrint.setGamesWon(OutPrint.getGamesWon() + 1);
+                    }
+                }
+                default -> {
+                }
             }
         }
     }
 
     /**
-     *
-     * @param output
-     * @param objectMapper
-     * @param game
-     * @param action
-     * @param table
-     * @param player1
-     * @param player2
-     * @return
+     * Function used for useHeroAbility case. At first, it tests if there are any errors that
+     * can prevent the player from using their hero's ability (using testErrorUseHeroAbility).
+     * If there are no errors, there will be 4 cases, based on the 4 hero cards types.
+     * @return mana of the hero card used, so that it could be decreased from the player's
+     * total mana.
      */
     public static int testUseHeroAbility(final ArrayNode output, final ObjectMapper objectMapper,
             final GameInput game, final ActionsInput action, final ArrayList<ArrayList<CardInput>>
             table, final Player player1, final Player player2) {
-        final int case1 = 1, case2 = 2, case3 = 3, case4 = 4, maxRow = 3;
-        final int rowFront,  rowBack;
+
+        final int rowFront,  rowBack; CardInput hero; boolean error;
+        // get front and back row and hero for current player
         if (game.getPlayerTurn() == 1) {
             rowFront = ROW2; rowBack = ROW3;
-        } else {
-            rowFront = ROW1; rowBack = ROW0;
-        }
-        // error 1
-        if (game.getPlayerTurn() == 1 && player1.getMana() < player1.getCardHero().getMana()) {
-            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case1);
-            return 0;
-        }
-        if (game.getPlayerTurn() == 2 && player2.getMana() < player2.getCardHero().getMana()) {
-            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case1);
-            return 0;
-        }
-
-        CardInput hero;
-        if (game.getPlayerTurn() == 1) {
             hero = player1.getCardHero();
         } else {
+            rowFront = ROW1; rowBack = ROW0;
             hero = player2.getCardHero();
         }
-        // error 2
-        if (hero.isHasAttacked()) {
-            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case2);
-            return 0;
-        }
-        // error 3
-        if ((hero.getName().equals("Lord Royce") || hero.getName().equals("Empress Thorina"))
-                && (action.getAffectedRow() == rowFront
-                || action.getAffectedRow() == rowBack)) {
-            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case3);
-            return 0;
-        }
-        // error 4
-        if ((hero.getName().equals("General Kocioraw") || hero.getName().equals("King Mudface"))
-                && (action.getAffectedRow() == maxRow - rowFront
-                || action.getAffectedRow() == maxRow - rowBack)) {
-            OutPrint.printErrorUseHeroAbility(objectMapper, output, action, case4);
-            return 0;
-        }
 
-        // good test
-        if (hero.getName().equals("Lord Royce")) {
-            int idx = 0;
-            int attackMax = -1;
-            for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
-                if (table.get(action.getAffectedRow()).get(i).getAttackDamage() > attackMax) {
-                    attackMax = table.get(action.getAffectedRow()).get(i).getAttackDamage();
-                    idx = i;
+        if (game.getPlayerTurn() == 1) {
+            error = SmallFunctions.testErrorUseHeroAbility(objectMapper, output, action,
+                    player1, hero, rowFront, rowBack);
+        } else {
+            error = SmallFunctions.testErrorUseHeroAbility(objectMapper, output, action,
+                    player2, hero, rowFront, rowBack);
+        }
+        if (!error) {
+            // good test
+            if (hero.getName().equals("Lord Royce")) {
+                int idx = 0;
+                int attackMax = -1;
+                for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
+                    if (table.get(action.getAffectedRow()).get(i).getAttackDamage() > attackMax) {
+                        attackMax = table.get(action.getAffectedRow()).get(i).getAttackDamage();
+                        idx = i;
+                    }
                 }
+                table.get(action.getAffectedRow()).get(idx).setFrozen(true);
+                hero.setHasAttacked(true);
+                return hero.getMana();
             }
-            table.get(action.getAffectedRow()).get(idx).setFrozen(true);
-            hero.setHasAttacked(true);
-            return hero.getMana();
-        }
-        if (hero.getName().equals("Empress Thorina")) {
-            int idx = 0;
-            int healthMax = 0;
-            for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
-                if (table.get(action.getAffectedRow()).get(i).getHealth() > healthMax) {
-                    healthMax = table.get(action.getAffectedRow()).get(i).getHealth();
-                    idx = i;
+            if (hero.getName().equals("Empress Thorina")) {
+                int idx = 0;
+                int healthMax = 0;
+                for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
+                    if (table.get(action.getAffectedRow()).get(i).getHealth() > healthMax) {
+                        healthMax = table.get(action.getAffectedRow()).get(i).getHealth();
+                        idx = i;
+                    }
                 }
+                table.get(action.getAffectedRow()).remove(idx);
+                hero.setHasAttacked(true);
+                return hero.getMana();
             }
-            table.get(action.getAffectedRow()).remove(idx);
-            hero.setHasAttacked(true);
-            return hero.getMana();
-        }
-        if (hero.getName().equals("King Mudface")) {
-            for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
-                table.get(action.getAffectedRow()).get(i).setHealth(
-                        table.get(action.getAffectedRow()).get(i).getHealth() + 1);
+            if (hero.getName().equals("King Mudface")) {
+                for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
+                    table.get(action.getAffectedRow()).get(i).setHealth(
+                            table.get(action.getAffectedRow()).get(i).getHealth() + 1);
+                }
+                hero.setHasAttacked(true);
+                return hero.getMana();
             }
-            hero.setHasAttacked(true);
-            return hero.getMana();
-        }
-        if (hero.getName().equals("General Kocioraw")) {
-            for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
-                table.get(action.getAffectedRow()).get(i).setAttackDamage(
-                        table.get(action.getAffectedRow()).get(i).getAttackDamage() + 1);
+            if (hero.getName().equals("General Kocioraw")) {
+                for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
+                    table.get(action.getAffectedRow()).get(i).setAttackDamage(
+                            table.get(action.getAffectedRow()).get(i).getAttackDamage() + 1);
+                }
+                hero.setHasAttacked(true);
+                return hero.getMana();
             }
-            hero.setHasAttacked(true);
-            return hero.getMana();
         }
         return 0;
     }
+
     /**
-     *
-     * @param table
-     * @param game
-     * @return
+     * Function that tests whether there are tank cards on the opponent's rows.
+     * @return true (there are tank cards on the opponent's rows) / false (otherwise)
      */
     public static boolean testIfThereAreTanks(final ArrayList<ArrayList<CardInput>> table,
                                               final GameInput game) {
+        int rowFrontEnemy, rowBackEnemy;
         if (game.getPlayerTurn() == 1) {
-            for (int y = 0; y < table.get(ROW0).size(); y++) {
-                if (table.get(ROW0).get(y).isTank(table.get(ROW0).get(y))) {
-                    return true;
-                }
-            }
-            for (int y = 0; y < table.get(ROW1).size(); y++) {
-                if (table.get(ROW1).get(y).isTank(table.get(ROW1).get(y))) {
-                    return true;
-                }
-            }
-            return false;
+            rowFrontEnemy = ROW1; rowBackEnemy = ROW0;
         } else {
-            for (int y = 0; y < table.get(ROW2).size(); y++) {
-                if (table.get(ROW2).get(y).isTank(table.get(ROW2).get(y))) {
-                    return true;
-                }
-            }
-            for (int y = 0; y < table.get(ROW3).size(); y++) {
-                if (table.get(ROW3).get(y).isTank(table.get(ROW3).get(y))) {
-                    return true;
-                }
-            }
-            return false;
+            rowFrontEnemy = ROW2; rowBackEnemy = ROW3;
         }
-    }
-
-    /**
-     *
-     * @param card
-     * @return
-     */
-    public static boolean testIfSpecialCard(final CardInput card) {
-        if (Objects.equals(card.getName(), "Miraj")
-                || Objects.equals(card.getName(), "The Ripper")
-                || Objects.equals(card.getName(), "Disciple")
-                || Objects.equals(card.getName(), "The Cursed One")) {
-            return true;
+        for (int i = 0; i < table.get(rowFrontEnemy).size(); i++) {
+            if (CardInput.isTank(table.get(rowFrontEnemy).get(i))) {
+                return true;
+            }
+        }
+        for (int i = 0; i < table.get(rowBackEnemy).size(); i++) {
+            if (CardInput.isTank(table.get(rowBackEnemy).get(i))) {
+                return true;
+            }
         }
         return false;
-    }
-
-    /**
-     *
-     * @param action
-     * @param table
-     */
-    public static void firestorm(final ActionsInput action,
-                                 final ArrayList<ArrayList<CardInput>> table) {
-        for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
-            table.get(action.getAffectedRow()).get(i).setHealth(table.
-                    get(action.getAffectedRow()).get(i).getHealth() - 1);
-            if (table.get(action.getAffectedRow()).get(i).getHealth() == 0) {
-                table.get(action.getAffectedRow()).remove(i);
-                i--;
-            }
-        }
-    }
-
-    /**
-     *
-     * @param action
-     * @param table
-     */
-    public static void winterfell(final ActionsInput action,
-                                  final ArrayList<ArrayList<CardInput>> table) {
-        for (int i = 0; i < table.get(action.getAffectedRow()).size(); i++) {
-            table.get(action.getAffectedRow()).get(i).setFrozen(true);
-        }
-    }
-
-    /**
-     *
-     * @param output
-     * @param action
-     * @param table
-     * @return
-     */
-    public static boolean heartHound(final ArrayNode output, final ActionsInput
-            action, final ArrayList<ArrayList<CardInput>> table) {
-        final int maxRow = 4, maxCol = 5, case4 = 4;
-        int currRow = maxRow - action.getAffectedRow();
-        if (table.get(currRow).size() < maxCol) {
-            CardInput cardStolen = table.get(action.getAffectedRow()).get(0);
-            for (int i = 1; i < table.get(action.getAffectedRow()).size(); i++) {
-                if (cardStolen.health < table.get(action.getAffectedRow()).get(i).health) {
-                    cardStolen = table.get(action.getAffectedRow()).get(i);
-                }
-            }
-            table.get(action.getAffectedRow()).remove(cardStolen);
-            table.get(currRow).add(cardStolen);
-            return true;
-        } else {
-            OutPrint.printErrorEnvironment(output, action, case4);
-            return false;
-        }
-    }
-
-    /**
-     *
-     * @param card
-     * @return
-     */
-    public int getPosition(final CardInput card) {
-        if (Objects.equals(card.name, "The Ripper")
-                || Objects.equals(card.name, "Miraj")
-                || Objects.equals(card.name, "Goliath")
-                || Objects.equals(card.name, "Warden")) {
-            return 1; // front
-        } else if (Objects.equals(card.name, "Sentinel")
-                || Objects.equals(card.name, "Disciple")
-                || Objects.equals(card.name, "The Cursed One")
-                || Objects.equals(card.name, "Berserker")) {
-            return 2; // back
-        }
-        return 0;
-    }
-
-    /**
-     *
-     */
-    public static CardInput copyOneCard(final ArrayList<CardInput> deck, final int i) {
-        CardInput card = new CardInput();
-        card.setMana(deck.get(i).getMana());
-        card.setAttackDamage(deck.get(i).getAttackDamage());
-        card.setHealth(deck.get(i).getHealth());
-        card.setDescription(deck.get(i).getDescription());
-        card.setColors(deck.get(i).getColors());
-        card.setName(deck.get(i).getName());
-
-        return card;
     }
 
     @Override
