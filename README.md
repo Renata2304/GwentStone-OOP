@@ -4,7 +4,7 @@
 
 <div align="center"><img src="https://tenor.com/view/witcher3-gif-9340436.gif" width="500px"></div>
 
-#### Assignment Link: [https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/tema](https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/tema)
+#### Assignment Link: [https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/tema](https://ocw.cs.pub.ro/courses/poo-ca-cd/arhiva/teme/2022/tema)
 
 
 ## Skel Structure
